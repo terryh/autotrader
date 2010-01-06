@@ -4,9 +4,13 @@ WHAT'S IT
 
 A set of script for you to trade any financial product in market, for now I only test on future index product.
 
-This is early release for U to refer, it can't work now, we follow kiss(Keep It Simple & Stupid) rule. We try to have an Easy Language like trading environment (Trade Station), that let people don't have to learn too much. 
+This is early release for U to refer, it can't work now, we follow kiss(Keep It Simple & Stupid) rule. 
 
-Keeping every function tiny, easy, and small not easy break down the trading system, and easy to understand.
+We try to have an Easy Language like trading environment (Trade Station), 
+
+that let people don't have to learn too much. 
+
+Keeping every function tiny, easy, and small not easy to break down the trading system, and easy to understand.
 
 
 Just for you to test or some other developer interested in this field.
