@@ -1,0 +1,44 @@
+WHAT'S IT
+==========
+
+
+A set of script for you to trade any financial product in market, for now I only test on future index product.
+
+This is early release for U to refer, it can't work now, we follow kiss(Keep It Simple & Stupid) rule. We try to have an Easy Language like trading environment (Trade Station), that let people don't have to learn too much. 
+
+Keeping every function tiny, easy, and small not easy break down the trading system, and easy to understand.
+
+
+Just for you to test or some other developer interested in this field.
+
+
+
+
+HOW-TO
+==========
+
+For developer you should have Python environment, most Linux distribution had installed, on Windows you can download it at http://www.python.org/ 
+
+
+In the near future we release the windows executable binary(.exe file) for download.
+
+autotrader.py -m TFX.csv strategy.py
+    
+    this will fire you strategy to test the default period of market data
+
+
+autotrader.py --pov=200 --tax=1000 --start=2009-09-01 -m TFX.csv strategy.py
+
+    this will fire you strategy to test from 2009-09-01 of market data to end, 
+
+    pov mean Point of Value, tax  mean, how much will cost per trade, you must have pov and tax at the same time
+
+FIXME
+=======
+
+You are welcome to send any patches.
+
+
+License: BSD
+
+Author: TerryH, email: terryh.tp@gmail.com,
