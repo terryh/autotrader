@@ -3,7 +3,7 @@
 
 """
 Fast Moving Average
-Author: TerryH, email: terryh.tp@gmail.com, 2009-12-25 19:42:18+08:00
+Author: TerryH, email: terryh.tp at gmail.com, 2009-12-25 19:42:18+08:00
 License: BSD
 """
 def AverageFC(price,length):

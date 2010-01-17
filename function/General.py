@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 """
 General include OPEN, HIGH, LOW, CLOSE, VLOUMN
-Author: TerryH, email: terryh.tp@gmail.com, 2009-12-25 19:42:18+08:00
+Author: TerryH, email: terryh.tp at gmail.com, 
 License: BSD
 """
 def General(dataset,length=300):

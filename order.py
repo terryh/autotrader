@@ -1,15 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 """
-tracking on our order and state
-Author: TerryH, email: terryh.tp@gmail.com, 
-Thu, 31 Dec 2009 16:11:03 +0800
+trackin on our order and state
+Author: TerryH, email: terryh.tp at gmail.com, 
 License: BSD
 """
 
-__version__ = '0.0.1'
-__author__ = 'TerryH'
 
 import datetime
 

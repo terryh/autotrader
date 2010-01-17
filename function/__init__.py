@@ -3,22 +3,15 @@
 
 """
 place holder
-Author: TerryH, email: terryh.tp@gmail.com, 2009-12-25 19:42:18+08:00
+Author: TerryH, email: terryh.tp at gmail.com,
 License: BSD
 """
 from AverageFC import *
 from General import *
 
-ROUND = round
-Round = round
-
-SUM = sum
-Sum = sum
-
-MIN = min
-Min = min
-
-ABSVALUE = abs
-AbsValue = abs
+ROUND = Round = round
+SUM = Sum = sum
+MIN = Min = min
+ABSVALUE = AbsValue = abs
 
 

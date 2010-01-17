@@ -3,13 +3,9 @@
 
 """
 A tool load stock history data from csv file 
-Author: TerryH, email: terryh.tp@gmail.com, 
-Thu, 31 Dec 2009 16:10:01 +0800
+Author: TerryH, email: terryh.tp at gmail.com, 
 License: BSD
 """
-
-__version__ = '0.0.1'
-__author__ = 'TerryH'
 
 import datetime
 import sys
@@ -85,7 +81,6 @@ def csvtolist(filename="",backbars=300,maxbars=False,start="",end=""):
                     edate = end.split("-") 
                     edate = map(int,edate)
                     edate = datetime.datetime(edate[0],edate[1],edate[2])+ datetime.timedelta(days=1)# delay one day
-                    print edate
                     while ei<00 and maxloop<10:
                         eds = edate.strftime("%Y-%m-%d")
                         eds = eds.replace("-",date_split)
@@ -102,7 +97,6 @@ def csvtolist(filename="",backbars=300,maxbars=False,start="",end=""):
 
             else:
                 lines = lines[-backbars:]
-            print si,ei
             for line in lines:
                 ll = line.split(",")  
                 ll = map(string.strip,ll)
