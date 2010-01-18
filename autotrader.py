@@ -194,11 +194,6 @@ def autotrader(strategy_file="", market_file="",backbars=300, interval=1,
             LOW  = Low  = L =ll
             CLOSE= Close= C =cl
             VOLUME=Volume=V = vl
-            OO = ol[0] 
-            HH = hl[0] 
-            LL = ll[0] 
-            CC = cl[0] 
-            VV = vl[0] 
             exec(strategy_source)
 
             time.sleep(interval)
@@ -278,7 +273,7 @@ def main(strategies=[],market="",backbars=300,interval=1, \
                         ql = quote_list
                         # convert ticket time to datetime
                         qt = datetime.datetime.combine(now.date(),ql[0])
-                        if pt<ticket_start and qt>=ticket_start or tip !=ti:
+                        if (pt<ticket_start and qt>=ticket_start) or tip !=ti:
                             # this bar first ticket
                             tip = ti # record the ticket index, until exit this ticket, we will enter again
                             OO = ql[1]
@@ -298,7 +293,6 @@ def main(strategies=[],market="",backbars=300,interval=1, \
                         if now>=ticket_end:
                             # close a ticket
                             # make another call for ticket
-                            quote_list = quote_update(quote=quote)
                             line = ticket_end.strftime("%Y/%m/%d,%H:%M")
                             pv = ql[2]
                             qline= "%s,%s,%s,%s,%s" % (str(OO),str(HH),str(LL),str(CC),str(VV))
