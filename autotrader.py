@@ -186,7 +186,10 @@ def autotrader(strategy_file="", market_file="",backbars=300, interval=1,
             ORDER.REPORT()
             
         while RUN and quote:
-            #print datetime.datetime.now()
+            #print datetime.datetime.now(),ORDER,ORDER.market_position, ORDER.dt
+            ORDER.dt = dataset[-1][0]
+            MARKETPOSITION=MarketPosition=marketposition=MKS = ORDER.market_position
+            ENTRYPRICE=EntryPrice=entryprice = ORDER.entry_price
             DATE = Date=dl
             TIME = Time=tl
             OPEN = Open = O =ol
@@ -256,11 +259,13 @@ def main(strategies=[],market="",backbars=300,interval=1, \
             pt = datetime.datetime(1900,1,1) # previous time
             pv = 0 # previous bar total volume
             tip = 0 # previous ticket index
+            # in case our time is slow that market, plus 5 seconds
+            lastticket_end = datetime.datetime.combine(now.date(),timeframe_list[-1]) + datetime.timedelta(seconds=5)
             #print ti,market_open
-            
+            #print timeframe_list,delta 
             try:
-
-                while ti<len(timeframe_list):
+ 
+                while ti<len(timeframe_list) and now <lastticket_end:
                     now = datetime.datetime.now()
                     # start ticket 
                     ticket_time = timeframe_list[ti]
@@ -280,6 +285,7 @@ def main(strategies=[],market="",backbars=300,interval=1, \
                             HH = ql[1]
                             LL = ql[1]
                             CC = ql[1]
+                            VV = ql[2]-pv
 
                         elif qt>=ticket_start and qt< ticket_end:
                             # change HH, LL
@@ -292,7 +298,6 @@ def main(strategies=[],market="",backbars=300,interval=1, \
 
                         if now>=ticket_end:
                             # close a ticket
-                            # make another call for ticket
                             line = ticket_end.strftime("%Y/%m/%d,%H:%M")
                             pv = ql[2]
                             qline= "%s,%s,%s,%s,%s" % (str(OO),str(HH),str(LL),str(CC),str(VV))
@@ -304,10 +309,9 @@ def main(strategies=[],market="",backbars=300,interval=1, \
                             ti = ti+1
                             # after new ticket, read it again
                             dataset = csvtolist(market,backbars=backbars)
-                       
+                            dl,tl,ol,hl,ll,cl,vl = General(dataset,length=backbars)
                         
                         pt = qt #remember as previous ticket time 
-
                     time.sleep(interval)
             
             except KeyboardInterrupt:
