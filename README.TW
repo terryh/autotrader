@@ -1,3 +1,9 @@
+申明
+=====
+
+本程式，對任何交易損失一概不負責，系統本生可能存在錯誤，請自行修改 ;-)
+
+
 這是什麼?
 ==========
 
@@ -51,7 +57,7 @@ autotrader.py --pov=200 --tax=1000 --start=2009-09-01 -m TFX.csv strategy.py
 autotrader.py -m TFX.csv -q R:\quote.txt strategy.py
 
     TFX.csv 是您要參考的歷史資料，預設回溯300根，及時監控的 TFX.csv 記得要太大，一般留您需要
-    回溯的資料亮就可以了可以加快速度
+    回溯的資料亮就可以了可以加快速度，格式您可以參考TFX.csv(台指期的範例資料)
     
     您可以用 --help 來看到更多的參數，預設是1秒查詢市場一次，quote.txt 則是報價文字介面檔，
     目前只支援 DDE，AutoTrader 有內建 DDEClient 的程式，設定好 DDESERVERS 後，執行 
