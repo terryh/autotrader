@@ -4,7 +4,7 @@ WHAT'S IT
 
 A set of script for you to trade any financial product in market, for now I only test on future index product.
 
-This is early release for U to refer, it can't work now, we follow kiss(Keep It Simple & Stupid) rule. 
+we follow kiss(Keep It Simple & Stupid) rule. 
 
 We try to have an Easy Language like trading environment (Trade Station), 
 
@@ -21,7 +21,7 @@ Just for you to test or some other developer interested in this field.
 HOW-TO
 ==========
 
-For developer you should have Python environment, most Linux distribution had installed, on Windows you can download it at http://www.python.org/ 
+For developer you should have Python environment, most Linux distribution had installed, on Windows you can download it at http://www.python.org/ , pywin32 http://sourceforge.net/projects/pywin32/files/ 
 
 
 In the near future we release the windows executable binary(.exe file) for download.

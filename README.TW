@@ -1,0 +1,104 @@
+這是什麼?
+==========
+
+這是一組手稿程式，可以幫您交易任何的金融商品，現在我只有在期指的商品上測試(TFX)，
+
+現在的版本已經可以運作了，目前，回測的功能很簡陋，目前不支援 tick 的模式，只有時間的方式，
+也沒有最佳化的功能，整個設計的邏輯，就是KISS的原則(Keep It Simple & Stupid)，盡可能的簡單化，
+整個交易系統核心，不包含空行及程式註解不到三百行。
+
+我們盡可能的讓策略程式語法和 Easy Language 一樣，方便您可以移植在Trade Station 上的現有的程式
+
+
+為什麼要用?
+=============
+
+因為我們Open Source ，您可以看到每一行程式碼，跟自己錢有關係的事情，你能放心交給盜版的軟體嗎？
+或是要付出龐大的費用忍受三天兩頭不穩定的更新嗎？不確定，不穩定，盜版，不知道什麼時候出現漏洞
+就像是微軟的IE一樣，有漏洞，可是不知道什麼時候會修，這樣的情形，你敢出門嗎？敢出國嗎？
+
+
+專案網址
+==========
+
+http://github.com/terryh/autotrader
+
+如何使用?
+==========
+
+如果您想幫忙開發，您必須有 Python 的開發環境，大多的 Linux 都已經有安裝了，在 Windows 上，
+您可以到這裡下載 http://www.python.org/ ，pywin32 http://sourceforge.net/projects/pywin32/files/ 
+以後會作 AutoTrader 的 Windows 的安裝包，及執行檔，給使用者下載
+
+執行方式，請到 Windows CMD 模式下執行
+
+autotrader.py -m TFX.csv strategy.py
+    
+    這樣就會執行您的策略 strategy.py（要叫什麼名字，您自己取），用的歷史資料檔是 TFX.csv，
+    用預設的時間回溯
+
+
+autotrader.py --pov=200 --tax=1000 --start=2009-09-01 -m TFX.csv strategy.py
+
+    這會回測您的策略程式由時間 2009-09-01  開始，到最後，也可以指定 --end=，格式同--start= 一樣，
+    也可以同時使用
+
+    pov 指的是，每點得金額(台指是200元)，tax 指的是，每一筆交易所需的稅金，必須同時都有指定，回測才
+    會計算金額，不然都只是算點數
+
+要即時監控市場，執行策略
+
+autotrader.py -m TFX.csv -q R:\quote.txt strategy.py
+
+    TFX.csv 是您要參考的歷史資料，預設回溯300根，及時監控的 TFX.csv 記得要太大，一般留您需要
+    回溯的資料亮就可以了可以加快速度
+    
+    您可以用 --help 來看到更多的參數，預設是1秒查詢市場一次，quote.txt 則是報價文字介面檔，
+    目前只支援 DDE，AutoTrader 有內建 DDEClient 的程式，設定好 DDESERVERS 後，執行 
+    ddeclient.py ，就可以一直更新報價了，目前只支援，時間，市價，累計成交量，所以您要知道，
+    您的DDE 報價源的這三個欄位的資料
+
+    DDEClient 的執行範例
+
+ddeclient.py --config=mydde.py R:\quote.txt
+
+    mydde.py 是我 DDE 報價源的設定，R:\quote.txt 則是我輸出到 memory disk 的報價檔，要給 AutoTrader 
+    用的，    目前 ddeclient.py  可以支援同商品，多個報價源，這是我的 mydde.py 
+    (名字可以自己取，我用日盛的DDE當範例) 的內容，#字號後面的，都是註解
+
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+DDESERVERS = [
+    {
+    'server': u'DDEEXCEL',
+    'topic': u'FUTURETXFA0',
+    'price': u'市價',
+    'total': u'累計交易量',
+    'time': u'時間',
+    },
+#    {
+#    'server': u'',
+#    'topic': u'',
+#    'price': u'',
+#    'total': u'',
+#    'time': u'',
+#    },
+]
+
+
+為什麼我要寫這一套程式
+=======================
+
+因為沒有簡單，又 Open Source 的軟體，不然，就是要費用，又不穩定，如果有請告訴我，我會加入，幫忙開發
+
+
+程式修正
+=========
+
+有任何的想法，或是程式的修正，儘管把 patch 送來，非常的歡迎
+
+
+License: BSD
+
+Author: TerryH, email: terryh.tp at gmail.com,
