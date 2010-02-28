@@ -60,7 +60,7 @@ class DDEClient(object):
     def __init__(self,server="",topic=""):
         # having our dde conversation fifrst
         self.ddeclient = dde.CreateServer()
-        self.ddeclient.Create("AutoClient")
+        self.ddeclient.Create("AutoTrader")
         self.conversation = dde.CreateConversation(self.ddeclient)
         self.ddeserver = ""
         self.ddedata = ""
@@ -152,11 +152,19 @@ def dde_query(dde_list=[],out=""):
         if fp:
             if content: 
                 cl = pickle.loads(content)
+
+                dde_volume = cl[2] 
             
         for dd in dde_list:
             tt = dd.request(dd.configdict['time'])
-            pp = int(dd.request(dd.configdict['price']))
-            vv = int(dd.request(dd.configdict['total']))
+            try:
+                pp = int(float(dd.request(dd.configdict['price'])))
+            except:
+                pp = 0
+            try:
+                vv = int(float(dd.request(dd.configdict['total'])))
+            except:
+                vv = 0
             if tt.find(":")>0:
                 # like HH:MM:SS
                 m1 = tt.find(":")
@@ -168,11 +176,12 @@ def dde_query(dde_list=[],out=""):
                 SS=int(tt[-2:])
                 MM=int(tt[-4:-2])
                 HH=int(tt[-6:-4])
-
+            
             tt = datetime.time(HH,MM,SS)
             nl = [tt,pp,vv]
-            if vv > dde_volume and nl[2] > cl[2] :
-                # volume bigger thant update
+            #print nl
+            if vv != dde_volume :
+                # volume bigger than update
                 fp = open(out,"w")
                 pickle.dump(nl,fp)
                 fp.close()
@@ -211,6 +220,8 @@ if __name__ == '__main__':
                 
                 exec(cmd)
                 dde_list = []
+                # FIXME find no way to create two dde Server at same time
+                DDESERVERS = DDESERVERS[:1]
                 for c in DDESERVERS:
                     if "server" in c and "topic" in c and 'price' in c and \
                         'time' in c and 'total' in c:

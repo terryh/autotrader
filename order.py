@@ -21,32 +21,39 @@ class Order(object):
         self.bars_since_entry = 0
         self.bars_since_exit = 0
         self.dt = 0
+        self.current_dt = 0
         self.pov = 0 # point value 
         self.tax = 0 # if have point and tax, accounting it
 
 
 
-    def BUY(self,condition_name="",price=0,datetime="",position=1):
-        if not datetime and self.dt:
-            datetime = self.dt
-        if self.market_position==0 and price and datetime not in self.order_time:
+    def BUY(self,condition_name="",price=0,position=1):
+
+        if self.market_position==0 and price and \
+            (self.dt not in self.order_time or
+            (self.current_dt and self.current_dt not in self.order_time) # for stop dorder
+            ):
+            # 
             #print "BUY"
             self.market_position = position
-            self.orders.append([datetime,condition_name,self.market_position,price])
-            self.order_time.append(datetime)
+            self.orders.append([self.dt,condition_name,self.market_position,price])
+            self.order_time.append(self.dt)
             self.entry_price = price
         
         
 
-    def SELL(self,condition_name="",price=0,datetime="",position=-1):
-        if not datetime and self.dt:
-            datetime = self.dt
+    def SELL(self,condition_name="",price=0,position=-1):
+      
         #print self.market_position==0 and price and datetime not in self.order_time
-        if self.market_position==0 and price and datetime not in self.order_time:
+        #print self,self.dt,condition_name,price,self.market_position,datetime
+        if self.market_position==0 and price and \
+            (self.dt not in self.order_time or 
+            (self.current_dt and self.current_dt not in self.order_time) 
+            ):
             #print "SELL"
             self.market_position = position
-            self.orders.append([datetime,condition_name,self.market_position,price])
-            self.order_time.append(datetime)
+            self.orders.append([self.dt,condition_name,self.market_position,price])
+            self.order_time.append(self.dt)
             self.entry_price = price
 
     def EXITLONG(self,condition_name="",price=0,datetime=""):

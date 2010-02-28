@@ -28,6 +28,8 @@ from csvloader import csvtolist
 from order import Order
 from function import *
 
+
+
 # parameters
 re_paras = re.compile("PARAS.?=.?{.*?}",re.DOTALL)
 # variables must have default value
@@ -83,7 +85,7 @@ def find_ticket(timeframe_list=[],delta="", now=""):
 
         
             
-def autotrader(strategy_file="", market_file="",backbars=300, interval=1, 
+def autotrader(strategy_file="", market_file="",backbars=300, interval=0.5, 
                quote=False,maxbars=False, start="",end="",pov=0,tax=0):
     """ autotrader(strategy_file,market_data,backbars)
         A set of script for you to trade any financial product in market
@@ -103,7 +105,7 @@ def autotrader(strategy_file="", market_file="",backbars=300, interval=1,
         
         -h --help       read the help
         
-        -i interval the timer for check the strategy, default 1 second
+        -i interval the timer for check the strategy, default 0.5 second
 
         --start=YYYY-MM-DD tell where to start
 
@@ -122,7 +124,8 @@ def autotrader(strategy_file="", market_file="",backbars=300, interval=1,
         
         YYYY-MM-DD,OPEN,HIGH,LOW,CLOSE,VOLUMN
     """
-    global RUN,dataset,OO,HH,LL,CC,VV,dl,tl,ol,hl,ll,cl,vl
+    global AUTOTRADER_RUN,NOW,CURRENT_BAR,RUNDATA,DATASET,OO,HH,LL,CC,VV,dl,tl,ol,hl,ll,cl,vl
+
     if strategy_file:
         
         print "Exec Strategy File-> ", strategy_file
@@ -158,14 +161,15 @@ def autotrader(strategy_file="", market_file="",backbars=300, interval=1,
         
         dl,tl,ol,hl,ll,cl,vl = [],[],[],[],[],[],[]
         
-        num = len(dataset)
+        num = len(RUNDATA)
         for i in range(num):
             # bind order variable
-            ORDER.dt = dataset[i][0]
+            ORDER.dt = RUNDATA[i][0]
+            DATASET = RUNDATA[:i+1]
             MARKETPOSITION=MarketPosition=marketposition=MKS = ORDER.market_position
             ENTRYPRICE=EntryPrice=entryprice = ORDER.entry_price
             # load record
-            dl,tl,ol,hl,ll,cl,vl = General_Row(dl,tl,ol,hl,ll,cl,vl,dataset[i],length=backbars)
+            dl,tl,ol,hl,ll,cl,vl = General_Row(dl,tl,ol,hl,ll,cl,vl,RUNDATA[i],length=backbars)
             DATE = Date=dl
             TIME = Time=tl
             OPEN = Open = O =ol
@@ -178,16 +182,16 @@ def autotrader(strategy_file="", market_file="",backbars=300, interval=1,
             LL = ll[0] 
             CC = cl[0] 
             VV = vl[0] 
-            # not exception catch, any error in strategy file we stop
             exec(strategy_source)
        
         # after looping all history we taken, 
         if start or end:  
             ORDER.REPORT()
-            
-        while RUN and quote:
+        # clear instance data 
+        OO = HH = LL = CC = 0
+        while AUTOTRADER_RUN and quote:
             #print datetime.datetime.now(),ORDER,ORDER.market_position, ORDER.dt
-            ORDER.dt = dataset[-1][0]
+            ORDER.dt = RUNDATA[-1][0]
             MARKETPOSITION=MarketPosition=marketposition=MKS = ORDER.market_position
             ENTRYPRICE=EntryPrice=entryprice = ORDER.entry_price
             DATE = Date=dl
@@ -197,6 +201,9 @@ def autotrader(strategy_file="", market_file="",backbars=300, interval=1,
             LOW  = Low  = L =ll
             CLOSE= Close= C =cl
             VOLUME=Volume=V = vl
+            if CURRENT_BAR:
+                ORDER.current_dt = CURRENT_BAR
+
             exec(strategy_source)
 
             time.sleep(interval)
@@ -214,22 +221,25 @@ def quote_update(market="",quote=""):
 
 
             
-def main(strategies=[],market="",backbars=300,interval=1, \
+def main(strategies=[],market="",backbars=300,interval=0.5, \
          quote="",maxbars=False,start="",end="",pov=0,tax=0):
     """If we are going to keep update the market file, and scanning for buy or sell signal
        could have many strategy for one market file
     """
     # share data, only read 
-    global RUN, dataset,OO,HH,LL,CC,VV,dl,tl,ol,hl,ll,cl,vl
-    RUN = True
-    thread_list = []
+    global AUTOTRADER_RUN,NOW,CURRENT_BAR,RUNDATA,DATASET,OO,HH,LL,CC,VV,dl,tl,ol,hl,ll,cl,vl
+    # init instance data 
+    OO = HH = LL = CC = CURRENT_BAR =  0
+    AUTOTRADER_RUN = True
+    thread_list = [] # threading list
+    NOW = now = datetime.datetime.now()
     # load dataset
     if market:
         if start or end:
-            dataset = csvtolist(market,start=start,end=end)
+            RUNDATA = csvtolist(market,start=start,end=end)
         else:
-            dataset = csvtolist(market,backbars=backbars)
-        tl = [] # threading list
+            RUNDATA = csvtolist(market,backbars=backbars)
+        
         if type(strategies) == types.ListType and len(strategies)>0:
             if quote:
                 # only have quote input, we use threading
@@ -247,8 +257,8 @@ def main(strategies=[],market="",backbars=300,interval=1, \
             # if have quote let's start our MAIN LOOOP
 
             #print quote
-            timeframe_list,delta = checktimeframe(dataset)
-            now = datetime.datetime.now()
+            timeframe_list,delta = checktimeframe(RUNDATA)
+            NOW = now = datetime.datetime.now()
             ti,market_open = find_ticket(timeframe_list,delta, now)
             if not market_open and ti==len(timeframe_list)-1:
                 # market not start yet, start from ti = 0, else condition just use the found ti (ticket index)
@@ -271,8 +281,12 @@ def main(strategies=[],market="",backbars=300,interval=1, \
                     ticket_time = timeframe_list[ti]
                     ticket_end = datetime.datetime.combine(now.date(),ticket_time)
                     ticket_start = ticket_end-delta
+                    # if our time is slow or fast for few seconds, let's say 5 seonds
+                    if ti == 0:
+                        ticket_start = ticket_start-datetime.timedelta(seconds=5)
+
                     quote_list = quote_update(quote=quote)
-                    
+                    #print quote_list    
                     # start a ticket
                     if quote_list:
                         ql = quote_list
@@ -288,6 +302,10 @@ def main(strategies=[],market="",backbars=300,interval=1, \
                             VV = ql[2]-pv
 
                         elif qt>=ticket_start and qt< ticket_end:
+                            CURRENT_BAR = ticket_time
+                            if not OO:
+                                # first time, qmpty value
+                                OO = HH = LL = CC  = ql[1]
                             # change HH, LL
                             if ql[1]>HH: HH = ql[1]
                             if ql[1]<LL: LL = ql[1]
@@ -295,6 +313,7 @@ def main(strategies=[],market="",backbars=300,interval=1, \
                             VV = ql[2]-pv
                             print ql[0],OO,HH,LL,CC,VV,
                             print "\r",# a trick to keep cursor at same line
+
 
                         if now>=ticket_end:
                             # close a ticket
@@ -308,22 +327,22 @@ def main(strategies=[],market="",backbars=300,interval=1, \
                             # increse ti ticket index
                             ti = ti+1
                             # after new ticket, read it again
-                            dataset = csvtolist(market,backbars=backbars)
-                            dl,tl,ol,hl,ll,cl,vl = General(dataset,length=backbars)
+                            RUNDATA = csvtolist(market,backbars=backbars)
+                            dl,tl,ol,hl,ll,cl,vl = General(RUNDATA,length=backbars)
                         
                         pt = qt #remember as previous ticket time 
                     time.sleep(interval)
             
             except KeyboardInterrupt:
         
-                RUN = False
+                AUTOTRADER_RUN = False
                 for t in thread_list:
                     t.join()
                 print "Finishing all job"
         
         # join all thread, if we have
         if thread_list:
-            RUN = False # stop all thread
+            AUTOTRADER_RUN = False # stop all thread
             for t in thread_list:
                 t.join()
             print "Finishing all job"
@@ -338,7 +357,7 @@ if __name__ == '__main__':
         market = ""
         backbars = 300
         maxbars=False
-        interval = 1
+        interval = 0.5
         start = 0
         end = 0
         pov = 0

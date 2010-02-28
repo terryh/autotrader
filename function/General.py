@@ -5,6 +5,10 @@ General include OPEN, HIGH, LOW, CLOSE, VLOUMN
 Author: TerryH, email: terryh.tp at gmail.com, 
 License: BSD
 """
+import datetime
+from math import sqrt
+from AverageFC import Average
+
 def General(dataset,length=300):
     """dateset is a item list in datetime order, and 
        dateset structure [dt,o,h,l,c,v] last is latest data
@@ -108,3 +112,80 @@ def Lowest(price=0,length=10):
     """price is a list
     """
     return min(price[:length])
+
+def HighD(dataset=[]):
+    """Find High of Day
+    """
+    tempd = datetime.date(1900,1,1)
+    tempV = 0
+    vl = []
+    if dataset:
+        for ll  in dataset:
+            dt,o,h,l,c,v = ll 
+            if dt.date() == tempd:
+                if h > tempV:
+                    tempV = h
+            else:
+                vl.append(tempV)    
+                tempV = h
+            
+            tempd = dt.date()
+        
+        # don't forget the last one
+        vl.append(tempV)    
+
+
+    vl.reverse()
+
+    return vl
+
+def LowD(dataset=[]):
+    """Find Low of Day
+    """
+    tempd = datetime.date(1900,1,1)
+    tempV = 0
+    vl = []
+    if dataset:
+        for ll  in dataset:
+            dt,o,h,l,c,v = ll 
+            if dt.date() == tempd:
+                if l < tempV:
+                    tempV = l
+            else:
+                vl.append(tempV)    
+                tempV = l
+            
+            tempd = dt.date()
+        
+        # don't forget the last one
+        vl.append(tempV)    
+
+
+    vl.reverse()
+
+    return vl
+
+def StdDev(price=0,length=10):
+    """Stardard Deviation
+    """
+    SumSqrt = 0
+    if price and len(price) >= length and length>0:
+        # Average return a list, just take first one
+        av = Average(price,length)[0]
+
+        for i in range(length):
+            SumSqrt = SumSqrt + (price[i]-av)*(price[i]-av)
+
+        return sqrt(SumSqrt/length)
+    else:
+        return 0
+
+def BollingerBand(price=0,length=10,stdev=2):
+    """BollingerBand
+    """
+    if price and len(price) >= length and length>0:
+        # Average return a list, just take first one
+        av = Average(price,length)[0]
+        return av + stddev*StdDev(price,length)
+    else:
+        return 0

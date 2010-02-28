@@ -98,6 +98,11 @@ def csvtolist(filename="",backbars=300,maxbars=False,start="",end=""):
             else:
                 lines = lines[-backbars:]
             for line in lines:
+                line = line.strip()
+                if line[0]==",": 
+                    line=line[1:]
+                if line[-1]==",": 
+                    line=line[:-1]
                 ll = line.split(",")  
                 ll = map(string.strip,ll)
                 # blanket first value
@@ -112,16 +117,31 @@ def csvtolist(filename="",backbars=300,maxbars=False,start="",end=""):
                 ss = 0
 
                 if "/" in ll[0]:
-                    date = ll[0].split("/") 
+                    # in case we have date time combine field
+                    datel = ll[0].split(" ")[0]
+                    date = datel.split("/")[:3]
                     date = map(int,date)
                 elif "-" in ll[0]:
-                    date = ll[0].split("-") 
+                    # in case we have date time combine field
+                    datel = ll[0].split(" ")[0]
+                    date = datel.split("-")[:3]
                     date = map(int,date)
             
                 if len(ll)==6:
                     # have no HH:MM:SS
                     #o,h,l,c,v = map(decimal.Decimal,ll[1:])
                     o,h,l,c,v = map(float,ll[1:])
+                    
+                    # may date time at first field
+                    if ll[0].find(":")>2:
+                        # find a mark like time
+                        dtl = ll[0]
+                        m1 = dtl.find(":")
+                        hh = int(dtl[m1-2:m1])
+                        mm = int(dtl[m1+1:m1+3])
+                        ss = 0
+
+
                 
                 elif len(ll)>6:
                     # having time 
