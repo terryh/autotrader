@@ -10,8 +10,9 @@ License: BSD
 import datetime
 import sys
 import getopt
-import decimal
 import string
+#import os
+#import mmap
 
 def csvtolist(filename="",backbars=300,maxbars=False,start="",end=""):
     """ csvtolist(filename="",backbars=300,maxbars=False,start="",end="")
@@ -25,7 +26,7 @@ def csvtolist(filename="",backbars=300,maxbars=False,start="",end=""):
         
         you also can test the result from command line 
         
-        csvtolist.py --back=number csvfile.csv
+        csvtolist.py --backbars=number csvfile.csv
         
         -h --help       read the help
         
@@ -39,133 +40,110 @@ def csvtolist(filename="",backbars=300,maxbars=False,start="",end=""):
         YYYY-MM-DD,OPEN,HIGH,LOW,CLOSE,VOLUMN
     """
 
-
     if filename:
-        fp = open(filename,"r+")
-        lines = fp.readlines()
-        sdate = ""
-        edate = ""
-        si = -1
-        ei = -1
-        maxloop = 0
-        date_split = "/"
-        # skip the first line for safe
-        if lines[1].split(",")>=6:
-            # prepare the return list
-            dl = []
-            if maxbars == True:
-                # do nothing
-                pass
+        fp           = open(filename,"rb")
+        #fsize       = os.path.getsize(filename)
+        content      = fp.read()
+        lines        = []
+        si           = -1 # start point index
+        ei           = -1
+        date_split   = "?"
+        dt_samefield = False # datetime
+        
+        # identify date text
+        if content.find('/') >= 4 : # AC year 2011/01/01
+            date_split="/"
+        elif content.find('-') >= 4:
+            date_split="-"
+        
+        # check for start or end
+        if start:
+            si = content.find(start)
 
-            elif start or end:
-                if len(lines)>2:
-                    # a simple test for this file more than two row
-                    oneline = lines[1] # take second line for process
-                    if "/" in oneline:
-                        date_split="/"
-                    elif "-" in ll[0]:
-                        date_split="-"
-                content = "".join(lines) # the file splitlines include \r or \n
-                if start:
-                    sdate = start.split("-") 
-                    sdate = map(int,sdate)
-                    sdate = datetime.datetime(sdate[0],sdate[1],sdate[2])
-                    while si<0 and maxloop<10:
-                        sds = sdate.strftime("%Y-%m-%d")
-                        sds = sds.replace("-",date_split)
-                        si = content.find(sds)
-                        sdate = sdate + datetime.timedelta(days=1)
-                        maxloop +=1
+        if end:
+            ei = content.find(end)
 
-                if end:
-                    edate = end.split("-") 
-                    edate = map(int,edate)
-                    edate = datetime.datetime(edate[0],edate[1],edate[2])+ datetime.timedelta(days=1)# delay one day
-                    while ei<00 and maxloop<10:
-                        eds = edate.strftime("%Y-%m-%d")
-                        eds = eds.replace("-",date_split)
-                        ei = content.find(eds)
-                        edate = edate + datetime.timedelta(days=1)
-                        maxloop +=1
-                
-                if si >0 and ei>0:
-                    lines = content[si:ei].splitlines() # this will strip \r or \n
-                elif si>0:
-                    lines = content[si:].splitlines()
-                elif ei>0:
-                    lines = content[:ei].splitlines()
-
-            else:
-                lines = lines[-backbars:]
-            for line in lines:
-                line = line.strip()
-                if line[0]==",": 
-                    line=line[1:]
-                if line[-1]==",": 
-                    line=line[:-1]
-                ll = line.split(",")  
-                ll = map(string.strip,ll)
-                # blanket first value
-                date = []
-                o = 0
-                h = 0
-                l = 0
-                c = 0
-                v = 0
-                hh = 0
-                mm = 0
-                ss = 0
-
-                if "/" in ll[0]:
-                    # in case we have date time combine field
-                    datel = ll[0].split(" ")[0]
-                    date = datel.split("/")[:3]
-                    date = map(int,date)
-                elif "-" in ll[0]:
-                    # in case we have date time combine field
-                    datel = ll[0].split(" ")[0]
-                    date = datel.split("-")[:3]
-                    date = map(int,date)
+        # prepare the return list
+        dl = []
             
-                if len(ll)==6:
-                    # have no HH:MM:SS
-                    #o,h,l,c,v = map(decimal.Decimal,ll[1:])
-                    o,h,l,c,v = map(float,ll[1:])
-                    
-                    # may date time at first field
-                    if ll[0].find(":")>2:
-                        # find a mark like time
-                        dtl = ll[0]
-                        m1 = dtl.find(":")
-                        hh = int(dtl[m1-2:m1])
-                        mm = int(dtl[m1+1:m1+3])
-                        ss = 0
+        if si >0 and ei>0:
+            lines = content[si:ei].splitlines() # this will strip \r or \n
+        elif si>0:
+            lines = content[si:].splitlines()
+        elif ei>0:
+            lines = content[:ei].splitlines()
 
+        else:
+            lines = content.splitlines()[-backbars:]
 
+        # check datetime combination in last line
+        lastline = lines[-1]
+        ll= lastline.split(',')
+        if ll[0].split(" ") > 1 and len(ll) == 6:
+            # datetime field YYYY/MM/DD HH:MM,OPEN,HIGH,LOW,CLOSE,VOLUMN 
+            dt_samefield = True
+            
+        for line in lines:
+            line = line.strip()
+            if line.startswith(","): 
+                line=line[1:]
+            if line.endswith(","): 
+                line=line[:-1]
+
+            ll = line.split(",")  
+            ll = map(string.strip,ll)
+            # blanket first value
+            date = []
+            o = 0
+            h = 0
+            l = 0
+            c = 0
+            v = 0
+            hh = 0
+            mm = 0
+            ss = 0
+
+            # in case we have date time combine field
+            datel = ll[0].split(" ")[0]
+            date = datel.split(date_split)[:3]
+            date = map(int,date)
+        
+            if dt_samefield:
+                # have no HH:MM:SS
+                #o,h,l,c,v = map(decimal.Decimal,ll[1:])
+                o,h,l,c,v = map(float,ll[1:])
                 
-                elif len(ll)>6:
-                    # having time 
-                    t = ll[1].split(':')
-                    t = map(int,t)
-                    hh = t[0]
-                    mm = t[1]
-                    if len(t)==3:
-                        ss = t[2]
-                    else:
-                        ss = 0
-                    
-                    #o,h,l,c,v = map(decimal.Decimal,ll[2:7])
-                    o,h,l,c,v = map(float,ll[2:7])
-                
-                if hh:
-                    dt = datetime.datetime(date[0],date[1],date[2],hh,mm,ss)
+                # may date time at first field
+                if ll[0].find(":")>2:
+                    # find a mark like time
+                    dtl = ll[0]
+                    m1 = dtl.find(":")
+                    hh = int(dtl[m1-2:m1])
+                    mm = int(dtl[m1+1:m1+3])
+                    ss = 0
+            
+            elif len(ll)>6:
+                # having time 
+                t = ll[1].split(':')
+                t = map(int,t)
+                hh = t[0]
+                mm = t[1]
+                if len(t)==3:
+                    ss = t[2]
                 else:
-                    dt = datetime.datetime(date[0],date[1],date[2])
+                    ss = 0
                 
-                dl.append([dt,o,h,l,c,v])
+                #o,h,l,c,v = map(decimal.Decimal,ll[2:7])
+                o,h,l,c,v = map(float,ll[2:7])
+            
+            if hh:
+                dt = datetime.datetime(date[0],date[1],date[2],hh,mm,ss)
+            else:
+                dt = datetime.datetime(date[0],date[1],date[2])
+            
+            dl.append([dt,o,h,l,c,v])
 
         return dl
-
 if __name__ == '__main__':
 
     opts, args = getopt.getopt(sys.argv[1:], "ahb:", ["all","help", "backbars=","start=","end="])
@@ -178,11 +156,11 @@ if __name__ == '__main__':
                 sys.exit()
             elif o in ("-b", "--backbars"):
                 import pprint
-                pprint.pprint(csvtolist(args[0],int(a)))
+                #pprint.pprint(csvtolist(args[0],int(a)))
                 #print csvtolist(args[0],int(a))
-                #import timeit
-                #tt = timeit.Timer("csvtolist(%s,%d)"%(args[0],int(a)),"from __main__ import csvtolist")
-                #print "Run csvtolist once take ",tt.timeit(100)/100
+                import timeit
+                tt = timeit.Timer("csvtolist('%s',%d)"%(args[0],int(a)),"from __main__ import csvtolist")
+                print "Run csvtolist once take ",tt.timeit(500)/500
             elif o in ("-a", "--all"):
                 print csvtolist(args[0],maxbars=True)
             elif o in ("--start"):
