@@ -1,0 +1,384 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-12-16 21:21+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: pricechart.py:109
+msgid "time"
+msgstr "時間"
+
+#: pricechart.py:110
+msgid "open"
+msgstr "開"
+
+#: pricechart.py:111
+msgid "high"
+msgstr "高"
+
+#: pricechart.py:112
+msgid "low"
+msgstr "低"
+
+#: pricechart.py:113
+msgid "close"
+msgstr "收"
+
+#: pricechart.py:114
+msgid "volumn"
+msgstr "量"
+
+#: autotrader.py:228
+msgid ""
+"You must at least have strategy file, commodity code, trading time period "
+"and max number of bars will use in strategy."
+msgstr "您必須至少有策略檔案，商品代碼，交易周期，及策略使用需要的最大資料筆數"
+
+#: autotrader.py:229 autotrader.py:237 wxobject.py:106 wxobject.py:681
+msgid "Strategy"
+msgstr "策略"
+
+#: autotrader.py:236 autotrader.py:336 autotrader.py:405 autotrader.py:574
+msgid "Are you sure want to update?"
+msgstr "您確定要更新嗎?"
+
+#: autotrader.py:273 autotrader.py:353 autotrader.py:492 autotrader.py:597
+msgid "Are you sure?"
+msgstr "請您確認?"
+
+#: autotrader.py:274 autotrader.py:354 autotrader.py:493 autotrader.py:598
+#: wxobject.py:310 wxobject.py:429 wxobject.py:637 wxobject.py:769
+msgid "Delete"
+msgstr "刪除"
+
+#: autotrader.py:328
+msgid ""
+"You must at least input DD1, time, price and volume, can refer from Excel."
+msgstr "您必須要至少一組 DDE 的設定，有時間，價格，總量，可以由 Excel 表格中參考資料"
+
+#: autotrader.py:329 autotrader.py:337 wxobject.py:480
+msgid "DDE"
+msgstr ""
+
+#: autotrader.py:397
+msgid ""
+"You must at least input Commodity Name, Commodity Code (alphanumeric), and "
+"Quote Folder for real time data processing, better at a ram disk folder."
+msgstr "您必須至少輸入商品名稱，商品代碼(只能是數字及英文)，最好可以有設定即時資料寫入的資料夾在"
+
+#: autotrader.py:398 autotrader.py:406 autotrader.py:567 autotrader.py:575
+#: wxobject.py:68 wxobject.py:172
+msgid "Market"
+msgstr "市場"
+
+#: autotrader.py:405
+msgid "Remember to restart to ative changes."
+msgstr "要啟用修改設定，請記得重新啟動"
+
+#: autotrader.py:457
+msgid "No support quote module found."
+msgstr "沒有找到支援的報價模組"
+
+#: autotrader.py:566
+msgid ""
+"You must at least input Market Name, Market Code (alphanumeric), Session "
+"Clear Time and Session 1 Time"
+msgstr "您必須至少輸入市場名稱，市場代碼(只能是數字及英文)，清盤時間，及第1盤的交易時間"
+
+#: autotrader.py:656 wxobject.py:180
+msgid "Market Name"
+msgstr "市場名稱"
+
+#: autotrader.py:657 autotrader.py:663 wxobject.py:187 wxobject.py:383
+#: wxobject.py:488
+msgid "Market Code"
+msgstr "市場代碼"
+
+#: autotrader.py:658 wxobject.py:194
+msgid "Market Time Zone"
+msgstr "市場時區"
+
+#: autotrader.py:661 wxobject.py:362
+msgid "Commodity Name"
+msgstr "商品名稱"
+
+#: autotrader.py:662 autotrader.py:669 wxobject.py:369 wxobject.py:495
+#: wxobject.py:696
+msgid "Commodity Code"
+msgstr "商品代碼"
+
+#: autotrader.py:664
+msgid "Quote Source"
+msgstr "報價源"
+
+#: autotrader.py:665 wxobject.py:401
+msgid "Quote Folder"
+msgstr "報價寫入資料夾"
+
+#: autotrader.py:668
+msgid "Id"
+msgstr ""
+
+#: autotrader.py:670
+msgid "Program File"
+msgstr "程式檔案"
+
+#: autotrader.py:671
+msgid "Time Period"
+msgstr "時間周期"
+
+#: wxobject.py:25
+msgid "AUTOTRADER"
+msgstr ""
+
+#: wxobject.py:32
+msgid "New Market"
+msgstr "新建市場"
+
+#: wxobject.py:36
+msgid "New Commodity"
+msgstr "新建商品"
+
+#: wxobject.py:40
+msgid "New Strategy"
+msgstr "新建策略"
+
+#: wxobject.py:46
+msgid "Exit"
+msgstr "離開"
+
+#: wxobject.py:50
+msgid "New"
+msgstr "新建"
+
+#: wxobject.py:53 wxobject.py:57
+msgid "About"
+msgstr "關於"
+
+#: wxobject.py:71
+msgid "Manage market information"
+msgstr "管理市場資料"
+
+#: wxobject.py:78
+msgid "System log"
+msgstr "系統紀錄"
+
+#: wxobject.py:96 wxobject.py:354
+msgid "Commodity"
+msgstr "商品"
+
+#: wxobject.py:99
+msgid "Manage commodity information"
+msgstr "管理商資料"
+
+#: wxobject.py:203
+msgid "Session Clear Time"
+msgstr "清盤時間"
+
+#: wxobject.py:214
+msgid "Session 1"
+msgstr "第1盤"
+
+#: wxobject.py:218 wxobject.py:244 wxobject.py:735
+msgid "Start"
+msgstr "開始"
+
+#: wxobject.py:226 wxobject.py:252 wxobject.py:742
+msgid "End"
+msgstr "結束"
+
+#: wxobject.py:240
+msgid "Session 2"
+msgstr "第2盤"
+
+#: wxobject.py:266
+msgid "Trade Day"
+msgstr "交易日"
+
+#: wxobject.py:270
+msgid "Sun"
+msgstr "日"
+
+#: wxobject.py:273
+msgid "Mon"
+msgstr "一"
+
+#: wxobject.py:277
+msgid "Tue"
+msgstr "二"
+
+#: wxobject.py:281
+msgid "Wed"
+msgstr "三"
+
+#: wxobject.py:285
+msgid "Thu"
+msgstr "四"
+
+#: wxobject.py:289
+msgid "Fri"
+msgstr "五"
+
+#: wxobject.py:293
+msgid "Sat"
+msgstr "六"
+
+#: wxobject.py:304 wxobject.py:415 wxobject.py:631 wxobject.py:763
+msgid "Submit"
+msgstr "確定"
+
+#: wxobject.py:307 wxobject.py:634
+msgid "Cancel"
+msgstr "取消"
+
+#: wxobject.py:376
+msgid "Point Value or Scale"
+msgstr "每點價值，或是倍數"
+
+#: wxobject.py:392
+msgid "Quote Source Directory"
+msgstr "報價源資料夾"
+
+#: wxobject.py:405
+msgid "Select a folder"
+msgstr "請選擇資料夾"
+
+#: wxobject.py:406
+msgid ""
+"Quote Folder for real time data processing, better at a ram disk folder."
+msgstr "即時報價寫入資料夾處，最好是在 Ram disk 上面"
+
+#: wxobject.py:418
+msgid "Config Quote Surce"
+msgstr "設定報價源"
+
+#: wxobject.py:423
+msgid "Show History Quote"
+msgstr ""
+
+#: wxobject.py:425
+msgid ""
+"The Folder store history, running sreategy will copy nessay data to Quote "
+"Source Directory."
+msgstr ""
+
+#: wxobject.py:505
+msgid "DDE 1"
+msgstr ""
+
+#: wxobject.py:509 wxobject.py:554
+msgid "Server"
+msgstr ""
+
+#: wxobject.py:516 wxobject.py:561
+msgid "Topic"
+msgstr ""
+
+#: wxobject.py:523 wxobject.py:568
+msgid "Time"
+msgstr "時間"
+
+#: wxobject.py:530 wxobject.py:575
+msgid "Price"
+msgstr "價格"
+
+#: wxobject.py:537 wxobject.py:582
+msgid "Volume"
+msgstr "總量"
+
+#: wxobject.py:550
+msgid "DDE 2"
+msgstr ""
+
+#: wxobject.py:595
+msgid "Tracking Trade Time Period"
+msgstr "追蹤交易周期"
+
+#: wxobject.py:599
+msgid "1 MIN"
+msgstr "1 分"
+
+#: wxobject.py:602
+msgid "2 MIN"
+msgstr "2 分"
+
+#: wxobject.py:605
+msgid "3 MIN"
+msgstr "3 分"
+
+#: wxobject.py:608
+msgid "5 MIN"
+msgstr "5 分"
+
+#: wxobject.py:611
+msgid "15 MIN"
+msgstr "15 分"
+
+#: wxobject.py:614
+msgid "30 MIN"
+msgstr "30 分"
+
+#: wxobject.py:617
+msgid "1 HOUR"
+msgstr "1 小時"
+
+#: wxobject.py:620
+msgid "1 DAY"
+msgstr "1 天"
+
+#: wxobject.py:689
+msgid "Strategy file"
+msgstr "策略檔案"
+
+#: wxobject.py:693
+msgid "Select a file"
+msgstr "請選擇檔案"
+
+#: wxobject.py:705
+msgid "Trade time period"
+msgstr "交易時間周期"
+
+#: wxobject.py:714
+msgid "Max number of bars strategy will use"
+msgstr "策略所以用最大交易使用資料筆數"
+
+#: wxobject.py:718
+msgid "300"
+msgstr ""
+
+#: wxobject.py:721
+msgid "Commision cost per unit"
+msgstr "每筆手續費"
+
+#: wxobject.py:725
+msgid "0"
+msgstr ""
+
+#: wxobject.py:731
+msgid "Back test period"
+msgstr "回測時間"
+
+#: wxobject.py:749
+msgid "Back test"
+msgstr "回測"
+
+#: wxobject.py:760
+msgid "Running"
+msgstr "執行"
+
+#: wxobject.py:766
+msgid "Validate"
+msgstr "確認"
