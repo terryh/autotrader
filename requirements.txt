@@ -1,0 +1,8 @@
+pytz
+configobj
+python-dateutil==1.5
+pandas
+numpy
+chaco
+# for docs
+# cloud_sptheme
