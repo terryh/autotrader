@@ -108,6 +108,7 @@ def Highest(price=0,length=10):
     """price is a list
     """
     return max(price[:length])
+
 def Lowest(price=0,length=10):
     """price is a list
     """

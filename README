@@ -1,49 +1,41 @@
+DECLARATION
+============
+
+This package is not fullly functional. We are not responsible for any LOSS via using this software.
+
 WHAT'S IT
 ==========
-LALA
 
-
-A set of script for you to trade any financial product in market, for now I only test on future index product.
+A set of script with a GUI interface for you to trade any financial product in market, for now I only test on future index product.
 
 we follow kiss(Keep It Simple & Stupid) rule. 
 
-We try to have an Easy Language like trading environment (Trade Station), 
-
-that let people don't have to learn too much. 
+We try to have an Easy Language like trading environment (Trade Station).
 
 Keeping every function tiny, easy, and small not easy to break down the trading system, and easy to understand.
 
-
 Just for you to test or some other developer interested in this field.
-
-
-
 
 HOW-TO
 ==========
 
-For developer you should have Python environment, most Linux distribution had installed, on Windows you can download it at http://www.python.org/ , pywin32 http://sourceforge.net/projects/pywin32/files/ 
+In the near future we'll release the windows executable binary(.exe file) for download.
 
+main GUI frontend autotrader.exe
 
-In the near future we release the windows executable binary(.exe file) for download.
+DEVELOPER
+===========
 
-autotrader.py -m TFX.csv strategy.py
-    
-    this will fire you strategy to test the default period of market data
-
-
-autotrader.py --pov=200 --tax=1000 --start=2009-09-01 -m TFX.csv strategy.py
-
-    this will fire you strategy to test from 2009-09-01 of market data to end, 
-
-    pov mean Point of Value, tax  mean, how much will cost per trade, you must have pov and tax at the same time
+For developer you should have Python environment on version 2.7, most Linux distribution had installed, on Windows you can download it from http://www.python.org/, 
+take a look at requirements.txt.
 
 FIXME
 =======
 
 You are welcome to send any patches.
 
-
-License: BSD
+License: MIT for individual, GPL for none individual.
 
 Author: TerryH, email: terryh.tp at gmail.com,
+
+Windows ICON from http://www.softicons.com/free-icons/toolbar-icons/fatcow-hosting-extra-icons-2-by-fatcow/

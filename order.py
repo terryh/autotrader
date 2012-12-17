@@ -90,8 +90,8 @@ class Order(object):
                 cn = self.orders[i][1]
                 mk = self.orders[i][2]
                 price = self.orders[i][3]
-
-                print dt.strftime("%Y/%m/%d,  %H:%M:%S,")+"  %10.5f"%(price)+"%15s,"%(cn)+"%5d,    "%(mk)
+                #print dt.strftime("%Y/%m/%d,  %H:%M:%S,")+"  %10.5f"%(price)+"%15s,"%(cn)+"%5d,    "%(mk)
+                print "%s, %10.5f, %15s, %5d" % ( dt.strftime("%Y/%m/%d,  %H:%M:%S"), price, cn, mk )
                 
                 if mk<0:
                     net = net-mk*price

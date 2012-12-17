@@ -165,28 +165,29 @@ def dde_query(dde_list=[],out=""):
                 vv = int(float(dd.request(dd.configdict['total'])))
             except:
                 vv = 0
-            if tt.find(":")>0:
-                # like HH:MM:SS
-                m1 = tt.find(":")
-                m2 = tt.rfind(":")
-                HH = int(tt[m1-2:m1])
-                MM = int(tt[m1+1:m2])
-                SS = int(tt[m2+1:m2+3])
-            elif len(tt)>=5 and len(tt)<=6:
-                SS=int(tt[-2:])
-                MM=int(tt[-4:-2])
-                HH=int(tt[-6:-4])
-            
-            tt = datetime.time(HH,MM,SS)
-            nl = [tt,pp,vv]
-            #print nl
-            if vv != dde_volume :
-                # volume bigger than update
-                fp = open(out,"w")
-                pickle.dump(nl,fp)
-                fp.close()
+            if tt:
+                if tt.find(":")>0:
+                    # like HH:MM:SS
+                    m1 = tt.find(":")
+                    m2 = tt.rfind(":")
+                    HH = int(tt[m1-2:m1])
+                    MM = int(tt[m1+1:m2])
+                    SS = int(tt[m2+1:m2+3])
+                elif len(tt)>=5 and len(tt)<=6:
+                    SS=int(tt[-2:])
+                    MM=int(tt[-4:-2])
+                    HH=int(tt[-6:-4])
                 
-                dde_volume = vv
+                tt = datetime.time(HH,MM,SS)
+                nl = [tt,pp,vv]
+                #print nl
+                if vv != dde_volume :
+                    # volume bigger than update
+                    fp = open(out,"w")
+                    pickle.dump(nl,fp)
+                    fp.close()
+                    
+                    dde_volume = vv
 
 if __name__ == '__main__':
     # take from HTS for example

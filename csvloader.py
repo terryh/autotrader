@@ -11,7 +11,7 @@ import datetime
 import sys
 import getopt
 import string
-#import os
+import os
 #import mmap
 
 def csvtolist(filename="",backbars=300,maxbars=False,start="",end=""):
@@ -40,7 +40,8 @@ def csvtolist(filename="",backbars=300,maxbars=False,start="",end=""):
         YYYY-MM-DD,OPEN,HIGH,LOW,CLOSE,VOLUMN
     """
 
-    if filename:
+    dl = []
+    if filename and os.path.isfile(filename):
         fp           = open(filename,"rb")
         #fsize       = os.path.getsize(filename)
         content      = fp.read()
@@ -61,10 +62,9 @@ def csvtolist(filename="",backbars=300,maxbars=False,start="",end=""):
             si = content.find(start)
 
         if end:
-            ei = content.find(end)
+            ei = content.rfind(end) # look up from end of file
 
         # prepare the return list
-        dl = []
             
         if si >0 and ei>0:
             lines = content[si:ei].splitlines() # this will strip \r or \n
@@ -75,7 +75,10 @@ def csvtolist(filename="",backbars=300,maxbars=False,start="",end=""):
 
         else:
             lines = content.splitlines()[-backbars:]
-
+        
+        # empty file
+        if not lines: return dl
+        
         # check datetime combination in last line
         lastline = lines[-1]
         ll= lastline.split(',')
@@ -143,7 +146,7 @@ def csvtolist(filename="",backbars=300,maxbars=False,start="",end=""):
             
             dl.append([dt,o,h,l,c,v])
 
-        return dl
+    return dl
 if __name__ == '__main__':
 
     opts, args = getopt.getopt(sys.argv[1:], "ahb:", ["all","help", "backbars=","start=","end="])
