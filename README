@@ -27,7 +27,8 @@ DEVELOPER
 ===========
 
 For developer you should have Python environment on version 2.7, most Linux distribution had installed, on Windows you can download it from http://www.python.org/, 
-take a look at requirements.txt.
+take a look at requirements.txt. This project use wxFormBuilder v3.3.4-beta to build GUI layout ( http://wxformbuilder.org/ ), you can open wx.fbp under wxFormBuilder for reference.
+
 
 FIXME
 =======

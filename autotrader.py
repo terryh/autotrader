@@ -109,9 +109,7 @@ class Process(multiprocessing.Process):
 # start multiprocessing.Process outside wxApp main loop
 def start_quote_process(quote_method, commodity='',commodity_ini=''):
     quote_module = __import__("quote.%s" % quote_method, fromlist=[quote_method])
-    # try until success via main wx.Timer
     p = multiprocessing.Process(target=quote_module.main, args=(commodity,commodity_ini))
-    #p = Process(target=quote_module.main, args=(commodity,commodity_ini))
     p.start()
     return p
 
@@ -124,15 +122,14 @@ def start_quote_workers(market_ini, commodity_ini, ccode ):
 ################################################################################
 # start subprocess.Popen outside wxApp main loop
 def sub_quote_process(quote_exe, commodity='',commodity_ini=''):
-    # try until success via main wx.Timer
     final_command = "%s --config=%s --commodity=%s" % (quote_exe, commodity_ini, commodity)
-    print final_command
+    #print final_command
     p = subprocess.Popen( final_command.split())
     return p
 
 def sub_quote_writer(market_ini, commodity_ini, ccode ):
     final_command = "%s --mini=%s --cini=%s --commodity=%s" % ( QUOTE_WRITER_EXE, market_ini, commodity_ini, ccode)
-    print final_command
+    #print final_command
     p = subprocess.Popen( final_command.split())
     return p
 ################################################################################
@@ -404,7 +401,7 @@ class Commodity(C, Mixin):
                 
                 if ccode not in self.configobj:
                     self.configobj[ccode] = {}
-                print raw_dict        
+                #print raw_dict        
                 
                 for key in self.field_keys:
                     self.configobj[ccode][key] = raw_dict.get(key,'')
@@ -608,20 +605,16 @@ class Market(M, Mixin):
 class FF(MyFrame):
     def __init__(self, *args, **kwds):
         MyFrame.__init__(self, *args, **kwds)
-        # art work
-        #self.quit = wx.MenuItem( self.menumain, wx.ID_ANY, u"離開"+ u"\t" + u"CTRL+X", wx.EmptyString, wx.ITEM_NORMAL )
-                                
-        #self.quit.SetBitmap(wx.ArtProvider.GetBitmap(wx.ART_QUIT,wx.ART_MENU,(16,16)))
-        #self.menumain.AppendItem( self.quit )
         
         self.quote_process = {}
         self.quote_workers = {}
         self.strategy_process = {}
 
         
+        # main application timer
         self.timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self.onTimer, self.timer)
-        self.timer.Start(1000*10) # main application timer
+        self.timer.Start(1000*10) 
         
         self.m_obj = {} # market
         self.c_obj = {} # commodity
@@ -659,8 +652,7 @@ class FF(MyFrame):
         self.sctrl.InsertColumn(1, _("Commodity Code"))
         self.sctrl.InsertColumn(2, _("Program File"))
         self.sctrl.InsertColumn(3, _("Time Period"))
-        print _
-        print _("Delete") 
+        
         self.loaddata() 
         self.render_all()
 
@@ -743,46 +735,21 @@ class FF(MyFrame):
         
         self.data = dd
     
-    def onStart(self,event):
-        # FIXME, clean up this def
-        start =  self.start.GetValue()
-        if start:
-            
-            self.start.SetLabel(u"停止下單")
-            self.sctrl.Enable(False)
-            #self.actrl.Enable(False)
-            self.saveall.Enable(False)
-            # disable menu
-            self.news.Enable(False)
-            self.newa.Enable(False)
-
-        else:
-            self.start.SetLabel(u"開始下單")
-            self.sctrl.Enable()
-            #self.actrl.Enable()
-            self.saveall.Enable()
-            # enable menu
-            self.news.Enable()
-            self.newa.Enable()
-            self.loginfo(u"停止下單")
-    
     def onAbout(self, event):
         info = wx.AboutDialogInfo()
         info.Name = __appname__
         info.Version = __version__
         info.Copyright = __author__
         info.Description = wordwrap(
-u"""An easy tool for you to trade any commodity you like.\n
-License: MIT for individual, GPL for none individual.\n
-Author: TerryH""",
+        _("An easy tool for you to trade any commodity you like.\nLicense: MIT for individual, GPL for none individual.\n Author: TerryH"),
             350, wx.ClientDC(self))
         info.WebSite = (u"http://terryh.tp.blogspot.com/", u"TerryH's Blog")
         wx.AboutBox(info)
     
     def onQuit(self,event):
         dlg = wx.MessageDialog(self, 
-                u'Are you sure?',
-                u'Close',
+                _('Are you sure?'),
+                _('Close'),
                 wx.YES_NO | wx.NO_DEFAULT | wx.ICON_INFORMATION
                 )
         val = dlg.ShowModal()
@@ -918,8 +885,6 @@ Author: TerryH""",
                 #multiprocessing.active_children()[0].terminate()
             #time.sleep(3) # wait for kill all, FIXME better way for waitting
         
-        print "All close" 
-
     def render_all(self):
         self.render_market()
 
