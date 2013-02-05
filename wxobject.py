@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*- 
 
 ###########################################################################
-## Python code generated with wxFormBuilder (version Mar 19 2012)
+## Python code generated with wxFormBuilder (version Oct  8 2012)
 ## http://www.wxformbuilder.org/
 ##
 ## PLEASE DO "NOT" EDIT THIS FILE!
@@ -78,6 +78,7 @@ class MyFrame ( wx.Frame ):
 		sbSizer9 = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, _(u"System log") ), wx.VERTICAL )
 		
 		self.log = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_MULTILINE|wx.TE_READONLY )
+		self.log.SetMaxLength( 0 ) 
 		sbSizer9.Add( self.log, 1, wx.ALL|wx.EXPAND, 5 )
 		
 		
@@ -182,6 +183,7 @@ class M ( wx.Dialog ):
 		gSizer3.Add( self.statictext, 0, wx.ALL, 5 )
 		
 		self.mname = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.mname.SetMaxLength( 0 ) 
 		gSizer3.Add( self.mname, 0, wx.ALL, 5 )
 		
 		self.m_staticText15 = wx.StaticText( self, wx.ID_ANY, _(u"Market Code"), wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -189,6 +191,7 @@ class M ( wx.Dialog ):
 		gSizer3.Add( self.m_staticText15, 0, wx.ALL, 5 )
 		
 		self.mcode = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.mcode.SetMaxLength( 0 ) 
 		gSizer3.Add( self.mcode, 0, wx.ALL, 5 )
 		
 		self.m_staticText141 = wx.StaticText( self, wx.ID_ANY, _(u"Market Time Zone"), wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -351,7 +354,7 @@ class M ( wx.Dialog ):
 class C ( wx.Dialog ):
 	
 	def __init__( self, parent ):
-		wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = _(u"Commodity"), pos = wx.DefaultPosition, size = wx.Size( 515,266 ), style = wx.DEFAULT_DIALOG_STYLE )
+		wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = _(u"Commodity"), pos = wx.DefaultPosition, size = wx.Size( 580,300 ), style = wx.DEFAULT_DIALOG_STYLE )
 		
 		self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
 		
@@ -364,6 +367,7 @@ class C ( wx.Dialog ):
 		gSizer1.Add( self.m_staticText7, 0, wx.ALL, 5 )
 		
 		self.cname = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.cname.SetMaxLength( 0 ) 
 		gSizer1.Add( self.cname, 0, wx.ALL, 5 )
 		
 		self.m_staticText10 = wx.StaticText( self, wx.ID_ANY, _(u"Commodity Code"), wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -371,6 +375,7 @@ class C ( wx.Dialog ):
 		gSizer1.Add( self.m_staticText10, 0, wx.ALL, 5 )
 		
 		self.ccode = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.ccode.SetMaxLength( 0 ) 
 		gSizer1.Add( self.ccode, 0, wx.ALL, 5 )
 		
 		self.m_staticText101 = wx.StaticText( self, wx.ID_ANY, _(u"Point Value or Scale"), wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -378,6 +383,7 @@ class C ( wx.Dialog ):
 		gSizer1.Add( self.m_staticText101, 0, wx.ALL, 5 )
 		
 		self.cpov = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.cpov.SetMaxLength( 0 ) 
 		gSizer1.Add( self.cpov, 0, wx.ALL, 5 )
 		
 		self.m_staticText161 = wx.StaticText( self, wx.ID_ANY, _(u"Market Code"), wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -422,7 +428,7 @@ class C ( wx.Dialog ):
 		
 		self.history = wx.Button( self, wx.ID_ANY, _(u"Show History Quote"), wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.history.Enable( False )
-		self.history.SetToolTipString( _(u"The Folder store history, running sreategy will copy nessay data to Quote Source Directory.") )
+		self.history.SetToolTipString( _(u"The Folder store history, running strategy will copy nessay data to Quote Source Directory.") )
 		
 		bSizer12.Add( self.history, 2, wx.ALL, 5 )
 		
@@ -490,6 +496,7 @@ class D ( wx.Dialog ):
 		gSizer3.Add( self.statictext, 0, wx.ALL, 5 )
 		
 		self.mcode = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_READONLY )
+		self.mcode.SetMaxLength( 0 ) 
 		gSizer3.Add( self.mcode, 0, wx.ALL, 5 )
 		
 		self.m_staticText15 = wx.StaticText( self, wx.ID_ANY, _(u"Commodity Code"), wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -497,6 +504,7 @@ class D ( wx.Dialog ):
 		gSizer3.Add( self.m_staticText15, 0, wx.ALL, 5 )
 		
 		self.ccode = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.TE_READONLY )
+		self.ccode.SetMaxLength( 0 ) 
 		gSizer3.Add( self.ccode, 0, wx.ALL, 5 )
 		
 		
@@ -511,6 +519,7 @@ class D ( wx.Dialog ):
 		bSizer10.Add( self.m_staticText162, 0, wx.ALL, 5 )
 		
 		self.dde1_server = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.dde1_server.SetMaxLength( 0 ) 
 		bSizer10.Add( self.dde1_server, 0, wx.ALL, 5 )
 		
 		self.m_staticText163 = wx.StaticText( self, wx.ID_ANY, _(u"Topic"), wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -518,6 +527,7 @@ class D ( wx.Dialog ):
 		bSizer10.Add( self.m_staticText163, 0, wx.ALL, 5 )
 		
 		self.dde1_topic = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.dde1_topic.SetMaxLength( 0 ) 
 		bSizer10.Add( self.dde1_topic, 0, wx.ALL, 5 )
 		
 		self.m_staticText16 = wx.StaticText( self, wx.ID_ANY, _(u"Time"), wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -525,6 +535,7 @@ class D ( wx.Dialog ):
 		bSizer10.Add( self.m_staticText16, 0, wx.ALL, 5 )
 		
 		self.dde1_time = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.dde1_time.SetMaxLength( 0 ) 
 		bSizer10.Add( self.dde1_time, 0, wx.ALL, 5 )
 		
 		self.m_staticText171 = wx.StaticText( self, wx.ID_ANY, _(u"Price"), wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -532,6 +543,7 @@ class D ( wx.Dialog ):
 		bSizer10.Add( self.m_staticText171, 0, wx.ALL, 5 )
 		
 		self.dde1_price = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.dde1_price.SetMaxLength( 0 ) 
 		bSizer10.Add( self.dde1_price, 0, wx.ALL, 5 )
 		
 		self.m_staticText1712 = wx.StaticText( self, wx.ID_ANY, _(u"Volume"), wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -539,6 +551,7 @@ class D ( wx.Dialog ):
 		bSizer10.Add( self.m_staticText1712, 0, wx.ALL, 5 )
 		
 		self.dde1_volume = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.dde1_volume.SetMaxLength( 0 ) 
 		bSizer10.Add( self.dde1_volume, 0, wx.ALL, 5 )
 		
 		
@@ -556,6 +569,7 @@ class D ( wx.Dialog ):
 		bSizer101.Add( self.m_staticText1621, 0, wx.ALL, 5 )
 		
 		self.dde2_server = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.dde2_server.SetMaxLength( 0 ) 
 		bSizer101.Add( self.dde2_server, 0, wx.ALL, 5 )
 		
 		self.m_staticText1631 = wx.StaticText( self, wx.ID_ANY, _(u"Topic"), wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -563,6 +577,7 @@ class D ( wx.Dialog ):
 		bSizer101.Add( self.m_staticText1631, 0, wx.ALL, 5 )
 		
 		self.dde2_topic = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.dde2_topic.SetMaxLength( 0 ) 
 		bSizer101.Add( self.dde2_topic, 0, wx.ALL, 5 )
 		
 		self.m_staticText161 = wx.StaticText( self, wx.ID_ANY, _(u"Time"), wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -570,6 +585,7 @@ class D ( wx.Dialog ):
 		bSizer101.Add( self.m_staticText161, 0, wx.ALL, 5 )
 		
 		self.dde2_time = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.dde2_time.SetMaxLength( 0 ) 
 		bSizer101.Add( self.dde2_time, 0, wx.ALL, 5 )
 		
 		self.m_staticText1711 = wx.StaticText( self, wx.ID_ANY, _(u"Price"), wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -577,6 +593,7 @@ class D ( wx.Dialog ):
 		bSizer101.Add( self.m_staticText1711, 0, wx.ALL, 5 )
 		
 		self.dde2_price = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.dde2_price.SetMaxLength( 0 ) 
 		bSizer101.Add( self.dde2_price, 0, wx.ALL, 5 )
 		
 		self.m_staticText17121 = wx.StaticText( self, wx.ID_ANY, _(u"Volume"), wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -584,6 +601,7 @@ class D ( wx.Dialog ):
 		bSizer101.Add( self.m_staticText17121, 0, wx.ALL, 5 )
 		
 		self.dde2_volume = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.dde2_volume.SetMaxLength( 0 ) 
 		bSizer101.Add( self.dde2_volume, 0, wx.ALL, 5 )
 		
 		
@@ -716,6 +734,7 @@ class S ( wx.Dialog ):
 		gSizer3.Add( self.m_staticText15, 0, wx.ALL, 5 )
 		
 		self.num = wx.TextCtrl( self, wx.ID_ANY, _(u"300"), wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.num.SetMaxLength( 0 ) 
 		gSizer3.Add( self.num, 0, wx.ALL, 5 )
 		
 		self.m_staticText151 = wx.StaticText( self, wx.ID_ANY, _(u"Commision cost per unit"), wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -723,6 +742,7 @@ class S ( wx.Dialog ):
 		gSizer3.Add( self.m_staticText151, 0, wx.ALL, 5 )
 		
 		self.cost = wx.TextCtrl( self, wx.ID_ANY, _(u"0"), wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.cost.SetMaxLength( 0 ) 
 		gSizer3.Add( self.cost, 0, wx.ALL, 5 )
 		
 		
@@ -770,6 +790,7 @@ class S ( wx.Dialog ):
 		bSizer9.Add( self.delete, 1, wx.ALL, 20 )
 		
 		self.sid = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 0,0 ), wx.TE_READONLY )
+		self.sid.SetMaxLength( 0 ) 
 		bSizer9.Add( self.sid, 0, wx.ALL, 5 )
 		
 		
