@@ -324,6 +324,7 @@ class QuoteWriter(object):
                 fp.close()
     
     def write_current(self):
+        print "write current..."
         for k,v in self.quote_type.items():
             #print k,v
             # min1 had wrote at def run
@@ -348,13 +349,14 @@ class QuoteWriter(object):
                     fp = open(self.quote_file_current[k], 'w')
                     fp.write(line)
                     fp.close()
-            elif VV:
+            else: 
                 # longer than 1 minute
                 # quote_data [[datatime, open, high, low, close, volume]...]
                 # self.ticket_index 0 1 2 3 4 5 6 ....
                 # self.quote_data[[0...], [1...], [2...], [3...], [4...], [5...]] + self.quote_current[6...] ...
 
                 remainder = (self.ticket_index+1) % v   # ticket_index 0..10...  (ticket_index + 1) % v ==0 on close bar minute
+                print "remainer ", k,v ,remainder
             
                 if remainder == 0:
                     # closing time frame for this bar
