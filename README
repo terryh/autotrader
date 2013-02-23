@@ -10,8 +10,6 @@ A set of script with a GUI interface for you to trade any financial product in m
 
 we follow kiss(Keep It Simple & Stupid) rule. 
 
-We try to have an Easy Language like trading environment (Trade Station).
-
 Keeping every function tiny, easy, and small not easy to break down the trading system, and easy to understand.
 
 Just for you to test or some other developer interested in this field.
