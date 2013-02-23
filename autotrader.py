@@ -41,7 +41,7 @@ from quote.utils import get_now, get_tz_hhmm
 # Process
 from quote.quoteworker import QuoteWriter
 
-__version__ = u'0.1.1'
+__version__ = u'0.2.1'
 __appname__ = u'AutoTrader'
 __author__ = u'TerryH'
 
