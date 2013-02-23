@@ -9,7 +9,7 @@ from wxobject import MyFrame, M, C, D, S
 
 import os
 import sys
-import logging 
+import logging
 import re
 import datetime
 import subprocess
@@ -24,7 +24,7 @@ from ctypes.wintypes import BOOL, DWORD, BYTE, INT, LPCWSTR, UINT, ULONG
 #from shutil import copyfile
 
 # locale
-#import gettext 
+#import gettext
 #_ = gettext.ugettext
 
 # third party module
@@ -63,18 +63,19 @@ quote_module_dir = 'quote'
 
 QUOTE_SOURCE = [u"",u'DDE']
 
+# fixed name for quoteworker
 QUOTE_WRITER_EXE = 'quoteworker.exe'
 
 # support tracking trade time
 SUPPORT_TIME = ['min1', 'min2', 'min3', 'min5', 'min15', 'min30', 'hour1', 'day1']
 SUPPORT_TIME_NAME = ['1 Min', '2 Min', '3 Min', '5 Min', '15 Min', '30 Min', '1 Hour', '1 Day' ]
-#SUPPORT_TIME_NAME = ['1 Min':'min1', 
-#                     '2 Min':'min2', 
-#                     '3 Min':'min3', 
-#                     '5 Min':'min5', 
-#                     '15 Min':'min15', 
-#                     '30 Min':'min30', 
-#                     '1 Hour':'hour1', 
+#SUPPORT_TIME_NAME = ['1 Min':'min1',
+#                     '2 Min':'min2',
+#                     '3 Min':'min3',
+#                     '5 Min':'min5',
+#                     '15 Min':'min15',
+#                     '30 Min':'min30',
+#                     '1 Hour':'hour1',
 #                     '1 Day':'day1'
 #                    }
 
@@ -107,6 +108,7 @@ class Process(multiprocessing.Process):
 
 ################################################################################
 # start multiprocessing.Process outside wxApp main loop
+# now in favor to subprocess.Popen via the following code block
 def start_quote_process(quote_method, commodity='',commodity_ini=''):
     quote_module = __import__("quote.%s" % quote_method, fromlist=[quote_method])
     p = multiprocessing.Process(target=quote_module.main, args=(commodity,commodity_ini))
@@ -146,7 +148,7 @@ class Mixin(object):
             elif getattr(self.__dict__[k],'GetPath', False):
                 raw_dict[k] = self.__dict__[k].GetPath()
         return raw_dict
- 
+
     def loaditem(self,code=''):
         if self.configobj and code in self.configobj:
             for k in self.field_keys:
@@ -176,13 +178,13 @@ class Strategy(S, Mixin):
         S.__init__(self, *args, **kwds)
         wx.EVT_CHAR_HOOK(self, self.onKey)
         self.configobj = {}
-        self.inifile = strategy_ini 
+        self.inifile = strategy_ini
         self.configobj = {}
         self.c_obj = ConfigObj( commodity_ini, encoding='utf-8')
-        self.field_keys = [ 'strategyfile', 'ccode',  
-                            'period', 'num', 'cost', 
+        self.field_keys = [ 'strategyfile', 'ccode',
+                            'period', 'num', 'cost',
                             'start', 'end', 'sid', 'run'
-                            ] 
+                            ]
         self.require_fields = ['strategyfile', 'ccode', 'period', 'num']
         self.ccode.SetItems( [ v.get('ccode') for k, v in self.c_obj.items() ] )
         self.period.SetItems( SUPPORT_TIME_NAME )
@@ -190,13 +192,13 @@ class Strategy(S, Mixin):
 
     def validate(self, raw_dict={}):
         for key in self.require_fields:
-            if not raw_dict.get(key, False): 
+            if not raw_dict.get(key, False):
                 return False
         # extra validate
         if not raw_dict.get('num').isdigit(): return False
         if raw_dict.get('cost', False) and not raw_dict.get('cost').isdigit(): return False
-        return True 
-    
+        return True
+
     def get_data_dir(self):
         if self.ccode.GetValue():
             ccode = self.ccode.GetValue()
@@ -206,20 +208,20 @@ class Strategy(S, Mixin):
                 os.makedirs(history_dir)
             return history_dir
         return ''
-    
+
     def onSubmit(self,event):
         raw_dict = self.collect_data()
-        
+
         if not self.validate(raw_dict):
-            dlg = wx.MessageDialog(self, 
+            dlg = wx.MessageDialog(self,
                     _("You must at least have strategy file, commodity code, trading time period and max number of bars will use in strategy."),
                     _("Strategy"),
-                    wx.OK | wx.ICON_INFORMATION 
+                    wx.OK | wx.ICON_INFORMATION
                     )
             val = dlg.ShowModal()
             dlg.Destroy()
         else:
-            dlg = wx.MessageDialog(self, 
+            dlg = wx.MessageDialog(self,
                     _("Are you sure want to update?"),
                     _("Strategy"),
                     wx.YES_NO | wx.YES_DEFAULT | wx.ICON_INFORMATION
@@ -228,10 +230,10 @@ class Strategy(S, Mixin):
             dlg.Destroy()
             if val == wx.ID_YES:
                 sid = self.sid.GetValue()
-                
+
                 if not sid:
-                    # let's find a new sid, forget about race, lock, and looping 
-                    start_id = 1  
+                    # let's find a new sid, forget about race, lock, and looping
+                    start_id = 1
                     if not sid:
                         sid = self.get_new_id()
                         raw_dict['sid'] = sid
@@ -239,24 +241,24 @@ class Strategy(S, Mixin):
                 if raw_dict.get('start'): raw_dict['start'] = wxd_to_python(raw_dict.get('start')).strftime('%Y-%m-%d')
                 if raw_dict.get('end'): raw_dict['end'] = wxd_to_python(raw_dict.get('end')).strftime('%Y-%m-%d')
 
-                
+
                 if sid not in self.configobj:
                     # insert
                     self.configobj[sid] = {}
-                
+
                 for key in self.field_keys:
                     self.configobj[sid][key] = raw_dict.get(key,'')
-                
+
                 self.configobj.write() # write ini file
                 self.Destroy()
 
     def onValidate(self,event):
         self.Close()
-    
+
     def onDelete(self,event):
         if self.configobj and self.sid.GetValue():
             sid = self.sid.GetValue()
-            dlg = wx.MessageDialog(self, 
+            dlg = wx.MessageDialog(self,
                     _('Are you sure?'),
                     _('Delete'),
                     wx.YES_NO | wx.YES_DEFAULT | wx.ICON_INFORMATION
@@ -268,7 +270,7 @@ class Strategy(S, Mixin):
                 del self.configobj[sid] # delete & write back
                 self.configobj.write()
                 self.Destroy()
-        
+
         self.Destroy()
 
     def onKey(self,event):
@@ -278,14 +280,14 @@ class Strategy(S, Mixin):
         event.Skip()
 
     def get_new_id(self):
-        start_id = 1  
+        start_id = 1
         sid = 0
         while not sid:
-            if not str(start_id) in self.configobj: 
+            if not str(start_id) in self.configobj:
                 sid = str(start_id)
                 return sid
-            start_id += 1 
-    
+            start_id += 1
+
     def loaddata(self):
         self.configobj = ConfigObj(self.inifile, encoding='utf-8')
 
@@ -295,31 +297,31 @@ class DDEWIN(D, Mixin):
         D.__init__(self, *args, **kwds)
         wx.EVT_CHAR_HOOK(self, self.onKey)
         self.configobj = {}
-        self.field_keys = [ 'mcode', 'ccode',  
-                            'dde1_server', 'dde1_topic','dde1_time', 'dde1_price', 'dde1_volume', 
-                            'dde2_server', 'dde2_topic','dde2_time', 'dde2_price', 'dde2_volume' 
-                            ] + SUPPORT_TIME 
+        self.field_keys = [ 'mcode', 'ccode',
+                            'dde1_server', 'dde1_topic','dde1_time', 'dde1_price', 'dde1_volume',
+                            'dde2_server', 'dde2_topic','dde2_time', 'dde2_price', 'dde2_volume'
+                            ] + SUPPORT_TIME
         self.require_fields = ['dde1_server', 'dde1_topic','dde1_time', 'dde1_price', 'dde1_volume']
 
     def validate(self, raw_dict={}):
         for key in self.require_fields:
-            if not raw_dict.get(key, False): 
+            if not raw_dict.get(key, False):
                 return False
-        return True 
-    
+        return True
+
     def onSubmit(self,event):
         raw_dict = self.collect_data()
-        
+
         if not self.validate(raw_dict):
-            dlg = wx.MessageDialog(self, 
+            dlg = wx.MessageDialog(self,
                     _("You must at least input DD1, time, price and volume, can refer from Excel."),
                     _("DDE"),
-                    wx.OK | wx.ICON_INFORMATION 
+                    wx.OK | wx.ICON_INFORMATION
                     )
             val = dlg.ShowModal()
             dlg.Destroy()
         else:
-            dlg = wx.MessageDialog(self, 
+            dlg = wx.MessageDialog(self,
                     _("Are you sure want to update?"),
                     _("DDE"),
                     wx.YES_NO | wx.YES_DEFAULT | wx.ICON_INFORMATION
@@ -327,16 +329,16 @@ class DDEWIN(D, Mixin):
             val = dlg.ShowModal()
             dlg.Destroy()
             if val == wx.ID_YES:
-                # TODO 
-                self.GetParent().update_quote(raw_dict, self.field_keys) 
+                # TODO
+                self.GetParent().update_quote(raw_dict, self.field_keys)
                 self.Destroy()
 
     def onCancel(self,event):
         self.Close()
-    
+
     def onDelete(self,event):
         if self.configobj:
-            dlg = wx.MessageDialog(self, 
+            dlg = wx.MessageDialog(self,
                     _('Are you sure?'),
                     _('Delete'),
                     wx.YES_NO | wx.YES_DEFAULT | wx.ICON_INFORMATION
@@ -344,17 +346,17 @@ class DDEWIN(D, Mixin):
             val = dlg.ShowModal()
             dlg.Destroy()
             if val == wx.ID_YES:
-                self.GetParent().delete_quote() 
+                self.GetParent().delete_quote()
                 self.Destroy()
 
         self.Destroy()
-    
+
     def onKey(self,event):
         keycode = event.GetKeyCode()
         if keycode == wx.WXK_ESCAPE:
             self.Close()
         event.Skip()
-    
+
 #------------------------------------------
 class Commodity(C, Mixin):
     def __init__(self, *args, **kwds):
@@ -362,33 +364,33 @@ class Commodity(C, Mixin):
         wx.EVT_CHAR_HOOK(self, self.onKey)
         self.field_keys = ['cname', 'ccode', 'mcode', 'cpov', 'csource', 'cdir']
         self.require_fields = ['cname', 'ccode', 'mcode']
-        self.inifile = commodity_ini 
+        self.inifile = commodity_ini
         self.configobj = {}
         self.m_obj = ConfigObj( market_ini, encoding='utf-8')
         self.markets = [ ( v.get('mname'), v.get('mcode') ) for k, v in self.m_obj.items() ]
         self.loaddata()
         self.csource.SetItems( QUOTE_SOURCE )
         self.mcode.SetItems( [ mcode for mname, mcode in self.markets ] )
-   
+
     def validate(self, raw_dict={}):
         for key in self.require_fields:
-            if not raw_dict.get(key, False): 
+            if not raw_dict.get(key, False):
                 return False
         if not re_alphanumeric.search(raw_dict.get('ccode')): return False
-        return True 
+        return True
 
     def onSubmit(self,event):
         raw_dict = self.collect_data()
         if not self.validate(raw_dict):
-            dlg = wx.MessageDialog(self, 
+            dlg = wx.MessageDialog(self,
                     _("You must at least input Commodity Name, Commodity Code (alphanumeric), and Quote Folder for real time data processing, better at a ram disk folder."),
                     _("Market"),
-                    wx.OK | wx.ICON_INFORMATION 
+                    wx.OK | wx.ICON_INFORMATION
                     )
             val = dlg.ShowModal()
             dlg.Destroy()
         else:
-            dlg = wx.MessageDialog(self, 
+            dlg = wx.MessageDialog(self,
                     _("Are you sure want to update?") + ' ' + _("Remember to restart to ative changes."),
                     _("Market"),
                     wx.YES_NO | wx.YES_DEFAULT | wx.ICON_INFORMATION
@@ -398,22 +400,22 @@ class Commodity(C, Mixin):
             if val == wx.ID_YES:
                 ccode = raw_dict['ccode'].upper()
                 raw_dict['ccode'] = ccode
-                
+
                 if ccode not in self.configobj:
                     self.configobj[ccode] = {}
-                #print raw_dict        
-                
+                #print raw_dict
+
                 for key in self.field_keys:
                     self.configobj[ccode][key] = raw_dict.get(key,'')
                 self.configobj.write() # write ini file
                 self.Close()
-    
+
     def onSource(self,event):
-        if self.csource.GetStringSelection(): 
+        if self.csource.GetStringSelection():
             self.config.Enable()
         else:
             self.config.Enable(False)
-         
+
     def onConfig(self,event):
         raw_dict = self.collect_data()
         source = raw_dict.get('csource')
@@ -423,7 +425,7 @@ class Commodity(C, Mixin):
         if source and source in QUOTE_SOURCE:
             support_time = SUPPORT_TIME # FIXME, check this value
             try:
-                exec('support_time = %s_SUPPORT_TIME' % source) 
+                exec('support_time = %s_SUPPORT_TIME' % source)
             except:
                 pass # FIXME, better chance to load support field
 
@@ -437,7 +439,7 @@ class Commodity(C, Mixin):
                 if self.configobj.get(ccode):
                     dlg.configobj = self.configobj.get(ccode)
                     dlg.loaditem('quote')
-                
+
                 dlg.ShowModal()
                 dlg.Destroy()
             except ImportError:
@@ -447,15 +449,15 @@ class Commodity(C, Mixin):
         history_dir =  self.check_history()
         if history_dir:
             if os.name == 'nt':
-                os.startfile(history_dir) 
+                os.startfile(history_dir)
             elif os.name == 'posix':
                 try:
                     os.system('xdg-open %s' % history_dir ) # try open histtory folder on linux
                 except:
                     pass # TODO
-    
+
     def check_history(self):
-        dir_name = ''        
+        dir_name = ''
         history_dir = ''
         if self.ccode.GetValue() and self.mcode.GetStringSelection():
             self.history.Enable()
@@ -466,16 +468,16 @@ class Commodity(C, Mixin):
             return history_dir
         else:
             self.history.Enable(False)
-        
-        return 
-    
+
+        return
+
     def onMcode(self,event):
         self.check_history()
-    
+
     def onDelete(self,event):
         ccode = self.ccode.GetValue().upper()
         if ccode and ccode in self.configobj:
-            dlg = wx.MessageDialog(self, 
+            dlg = wx.MessageDialog(self,
                     _('Are you sure?'),
                     _('Delete'),
                     wx.YES_NO | wx.YES_DEFAULT | wx.ICON_INFORMATION
@@ -486,37 +488,37 @@ class Commodity(C, Mixin):
                 del self.configobj[ccode]
                 self.configobj.write()
         self.Destroy()
-    
+
     def onKey(self,event):
         keycode = event.GetKeyCode()
         if keycode == wx.WXK_ESCAPE:
             self.Close()
         event.Skip()
-                
+
     def loaddata(self, m_obj={}):
         self.configobj = ConfigObj(self.inifile, encoding='utf-8')
         if m_obj:
             self.m_obj = m_obj
-    
+
     def set_market_obj(self, m_obj={}):
         if m_obj:
             self.m_obj = m_obj
-    
+
     def update_quote(self, quote_obj={}, field_keys=[]):
         if self.configobj and self.ccode.GetValue() and self.configobj.get(self.ccode.GetValue()):
             cid = self.ccode.GetValue()
             if not self.configobj[cid].get('quote', False):
                 self.configobj[cid]['quote']= {}
-            
+
             for k in field_keys:
                 self.configobj[cid]['quote'][k] = quote_obj.get(k,'')
             self.configobj.write()
-    
+
     def delete_quote(self):
         if self.configobj and self.ccode.GetValue() and self.configobj.get(self.ccode.GetValue()):
             del self.configobj[self.ccode.GetValue()]['quote']
             self.configobj.write()
- 
+
     def loaditem(self,ccode=''):
         super(Commodity, self).loaditem(ccode)
         if self.csource.GetStringSelection(): self.config.Enable()
@@ -527,37 +529,37 @@ class Market(M, Mixin):
     def __init__(self, *args, **kwds):
         M.__init__(self, *args, **kwds)
         wx.EVT_CHAR_HOOK(self, self.onKey)
-        self.field_keys = [ 'mname', 'mcode', 'mtimezone', 'mclear',  
-                            's1_start', 's1_end', 's2_start', 's2_end', 
+        self.field_keys = [ 'mname', 'mcode', 'mtimezone', 'mclear',
+                            's1_start', 's1_end', 's2_start', 's2_end',
                             'd0', 'd1', 'd2', 'd3', 'd4', 'd5', 'd6'
                             ]
         self.require_fields = ['mname', 'mcode', 'mtimezone', 'mclear', 's1_start','s1_end']
-        self.inifile = market_ini 
+        self.inifile = market_ini
         self.configobj = {}
         self.loaddata()
         self.mtimezone.SetItems(timezones)
 
     def validate(self, raw_dict={}):
         for key in self.require_fields:
-            if not raw_dict.get(key, False): 
+            if not raw_dict.get(key, False):
                 return False
         if not re_alphanumeric.search(raw_dict.get('mcode')): return False
         # special check for time 24HHMM
         if raw_dict['mclear'] == u'00:00' or raw_dict['s1_end'] == u'00:00': return False
 
-        return True 
+        return True
     def onSubmit(self,event):
         raw_dict = self.collect_data()
         if not self.validate(raw_dict):
-            dlg = wx.MessageDialog(self, 
+            dlg = wx.MessageDialog(self,
                     _("You must at least input Market Name, Market Code (alphanumeric), Session Clear Time and Session 1 Time"),
                     _("Market"),
-                    wx.OK | wx.ICON_INFORMATION 
+                    wx.OK | wx.ICON_INFORMATION
                     )
             val = dlg.ShowModal()
             dlg.Destroy()
         else:
-            dlg = wx.MessageDialog(self, 
+            dlg = wx.MessageDialog(self,
                     _("Are you sure want to update?"),
                     _("Market"),
                     wx.YES_NO | wx.YES_DEFAULT | wx.ICON_INFORMATION
@@ -573,14 +575,14 @@ class Market(M, Mixin):
                     self.configobj[mcode][key] = raw_dict.get(key,'')
                 self.configobj.write() # write ini file
                 self.Close()
-                
+
     def onCancel(self,event):
         self.Close()
-    
+
     def onDelete(self,event):
         mcode = self.mcode.GetValue().upper()
         if mcode and mcode in self.configobj:
-            dlg = wx.MessageDialog(self, 
+            dlg = wx.MessageDialog(self,
                     _('Are you sure?'),
                     _('Delete'),
                     wx.YES_NO | wx.YES_DEFAULT | wx.ICON_INFORMATION
@@ -591,13 +593,13 @@ class Market(M, Mixin):
                 del self.configobj[mcode]
                 self.configobj.write()
         self.Destroy()
-    
+
     def onKey(self,event):
         keycode = event.GetKeyCode()
         if keycode == wx.WXK_ESCAPE:
             self.Close()
         event.Skip()
-    
+
     def loaddata(self):
         self.configobj = ConfigObj(self.inifile, encoding='utf-8')
 
@@ -605,17 +607,18 @@ class Market(M, Mixin):
 class FF(MyFrame):
     def __init__(self, *args, **kwds):
         MyFrame.__init__(self, *args, **kwds)
-        
+
         self.quote_process = {}
         self.quote_workers = {}
+        self.trader = {}
         self.strategy_process = {}
 
-        
+
         # main application timer
         self.timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self.onTimer, self.timer)
-        self.timer.Start(1000*10) 
-        
+        self.timer.Start(1000*10)
+
         self.m_obj = {} # market
         self.c_obj = {} # commodity
         self.s_obj = {} # strategy
@@ -633,39 +636,39 @@ class FF(MyFrame):
             datefmt='%Y-%m-%d %H:%M:%S',
             filename=self.logfilename,
         )
-        self.logger = logging.getLogger('') 
+        self.logger = logging.getLogger('')
 
-        # Market 
+        # Market
         self.mctrl.InsertColumn(0, _("Market Name"))
         self.mctrl.InsertColumn(1, _("Market Code"))
         self.mctrl.InsertColumn(2, _("Market Time Zone"))
-        
-        # Commodity 
+
+        # Commodity
         self.cctrl.InsertColumn(0, _("Commodity Name"))
         self.cctrl.InsertColumn(1, _("Commodity Code"))
         self.cctrl.InsertColumn(2, _("Market Code"))
         self.cctrl.InsertColumn(3, _("Quote Source"))
         self.cctrl.InsertColumn(4, _("Quote Folder"))
-        
-        # Strategy 
+
+        # Strategy
         self.sctrl.InsertColumn(0, _("Id"))
         self.sctrl.InsertColumn(1, _("Commodity Code"))
         self.sctrl.InsertColumn(2, _("Program File"))
         self.sctrl.InsertColumn(3, _("Time Period"))
-        
-        self.loaddata() 
+
+        self.loaddata()
         self.render_all()
 
         # test
         self.test = None
-    
+
     def onMarket(self,event):
         dlg = Market(self)
         dlg.ShowModal()
         dlg.Destroy()
         self.load_market()
         self.render_market()
-    
+
     def onMarketActive(self,event):
         item_index = event.m_itemIndex
         mcode = self.mctrl.GetItem(item_index, 1).GetText()
@@ -682,7 +685,7 @@ class FF(MyFrame):
         dlg.Destroy()
         self.loaddata()
         self.render_commodity()
-    
+
     def onCommodityActive(self,event):
         item_index = event.m_itemIndex
         ccode = self.cctrl.GetItem(item_index, 1).GetText()
@@ -692,14 +695,14 @@ class FF(MyFrame):
         dlg.Destroy()
         self.load_commodity()
         self.render_commodity()
-    
+
     def onStrategy(self,event):
         dlg = Strategy(self)
         dlg.ShowModal()
         dlg.Destroy()
         self.load_strategy()
         self.render_strategy()
-    
+
     def onStrategyActive(self,event):
         item_index = event.m_itemIndex
         sid = self.sctrl.GetItem(item_index, 0).GetText()
@@ -709,7 +712,7 @@ class FF(MyFrame):
         dlg.Destroy()
         self.load_strategy()
         self.render_strategy()
-    
+
     def OnCheckItem(self,index, flag):
         sid = self.sctrl.GetItem(index, 0).GetText()
         #print index, flag, sid
@@ -720,7 +723,7 @@ class FF(MyFrame):
             else:
                 self.s_obj[sid]['run'] = ""
             self.s_obj.write()
-    
+
     def onSave(self,event):
         dd = {}
         for k in self.data_ids:
@@ -732,9 +735,9 @@ class FF(MyFrame):
                     dd[k] = item.GetValue()
             elif hasattr(item,'GetPath'):
                 dd[k] = item.GetPath()
-        
+
         self.data = dd
-    
+
     def onAbout(self, event):
         info = wx.AboutDialogInfo()
         info.Name = __appname__
@@ -745,9 +748,9 @@ class FF(MyFrame):
             350, wx.ClientDC(self))
         info.WebSite = (u"http://terryh.tp.blogspot.com/", u"TerryH's Blog")
         wx.AboutBox(info)
-    
+
     def onQuit(self,event):
-        dlg = wx.MessageDialog(self, 
+        dlg = wx.MessageDialog(self,
                 _('Are you sure?'),
                 _('Close'),
                 wx.YES_NO | wx.NO_DEFAULT | wx.ICON_INFORMATION
@@ -758,17 +761,17 @@ class FF(MyFrame):
             # close all process
             self.stop_process()
             self.Destroy()
-    
+
     def onTimer(self,event):
         """
-        create process for quote service, strategy  start or stop 
+        create process for quote service, strategy  start or stop
         """
         #if self.test == None:
             ##self.loginfo('onTimer start TEST')
             #proc = subprocess.Popen(sys.executable + " pp.py")
             #self.test = proc
         #self.loginfo(sys.executable)
-        
+
         # TODO, clean up
         #self.loginfo('onTimer')
         for k, v in self.c_obj.items():
@@ -781,33 +784,33 @@ class FF(MyFrame):
                 session_start = ''
                 session_end = ''
 
-                
+
                 mclear = self.m_obj[mcode]['mclear']
-                s1_start =  self.m_obj[mcode]['s1_start'] 
-                s1_end =  self.m_obj[mcode]['s1_end'] 
-                s2_end =  self.m_obj[mcode]['s2_end'] 
-                
+                s1_start =  self.m_obj[mcode]['s1_start']
+                s1_end =  self.m_obj[mcode]['s1_end']
+                s2_end =  self.m_obj[mcode]['s2_end']
+
                 if mclear and mclear != '00:00':
                     session_start = mclear
                 elif s1_start and s1_start != '00:00':
                     session_start = mclear
-                
+
                 if s2_end and s2_end != '00:00':
                     session_end = s2_end
                 elif s1_end and s1_end != '00:00':
                     session_end = s1_end
-                
-                key = "%s_%s" % (mcode, ccode) 
+
+                key = "%s_%s" % (mcode, ccode)
                 #self.loginfo(str(self.quote_process))
-               
+
                 if self.should_running(session_start, session_end, mtimezone):
                     # check this quote should running
                     if key not in self.quote_process:
                         # not running quote process
                         s_hour, s_minute = map(int, session_start.split(':',1))
                         now = get_now(mtimezone)
-                    
-                        market_start_time = get_tz_hhmm(s_hour, s_minute, mtimezone) 
+
+                        market_start_time = get_tz_hhmm(s_hour, s_minute, mtimezone)
                         self.loginfo(mtimezone)
                         self.loginfo(str(now))
                         self.loginfo(str(market_start_time))
@@ -816,29 +819,29 @@ class FF(MyFrame):
                         #if  (market_start_time-now).seconds < 60:
                         quote_module = __import__("quote.%s" % source , fromlist=[source])
                         quote_exe = source + ".exe"
-                        
+
                         self.loginfo(str(quote_module))
                         self.loginfo(quote_exe)
                         self.loginfo(ccode )
                         self.loginfo(self.commodity_ini)
-                        
+
                         #--------------------------------------------------
                         #  start_quote_process and start_quote_workers
                         #t = start_quote_process( source, ccode, self.commodity_ini )
                         #self.quote_process[key] = t
                         #w = start_quote_workers(self.market_ini, self.commodity_ini, ccode)
-                        #self.quote_workers[key] = w 
+                        #self.quote_workers[key] = w
                         #--------------------------------------------------
-                        
+
                         #--------------------------------------------------
                         #  sub_quote_process and sub_quote_workers
                         t = sub_quote_process( quote_exe, ccode, self.commodity_ini )
                         self.quote_process[key] = t
 
                         w = sub_quote_writer(self.market_ini, self.commodity_ini, ccode)
-                        self.quote_workers[key] = w 
+                        self.quote_workers[key] = w
                         #--------------------------------------------------
- 
+
     def should_running(self, start, end, timezone):
         if (start and end and timezone):
             now = get_now(timezone)
@@ -855,14 +858,14 @@ class FF(MyFrame):
             return now >= tzstart
 
         return False
-        
+
     def stop_process(self):
 
         # wait for close multiprocessing.Process
         #--------------------------------------------------
         for k in self.quote_process.keys():
             self.quote_process[k].terminate()
-        
+
         for k in self.quote_workers.keys():
             self.quote_workers[k].terminate()
 
@@ -877,14 +880,14 @@ class FF(MyFrame):
             #for k in self.quote_workers.keys():
                 #isalive = isalive + self.quote_workers[k].is_alive()
         #--------------------------------------------------
-        
+
         #if hasattr(sys, 'frozen'):
             ## We need to wait for all child processes otherwise
             ## --onefile mode won't work.
             #while multiprocessing.active_children():
                 #multiprocessing.active_children()[0].terminate()
             #time.sleep(3) # wait for kill all, FIXME better way for waitting
-        
+
     def render_all(self):
         self.render_market()
 
@@ -899,17 +902,17 @@ class FF(MyFrame):
             self.mctrl.SetStringItem(index, 2, v.get('mtimezone'))
             self.mctrl.SetColumnWidth(2, 100)
             self.mctrl.SetItemBackgroundColour(index, wx.Color(229,229,229))
-        
+
     def render_commodity(self):
         self.cctrl.DeleteAllItems()
         for k,v  in self.c_obj.items():
             index = self.cctrl.InsertStringItem(sys.maxint, v.get('cname'))
-            self.cctrl.SetStringItem(index, 1, v.get('ccode')) 
-            self.cctrl.SetStringItem(index, 2, v.get('mcode')) 
+            self.cctrl.SetStringItem(index, 1, v.get('ccode'))
+            self.cctrl.SetStringItem(index, 2, v.get('mcode'))
             self.cctrl.SetStringItem(index, 3, v.get('csource'))
             self.cctrl.SetStringItem(index, 4, v.get('cdir'))
             self.cctrl.SetItemBackgroundColour(index, wx.Color(229,229,229))
-    
+
     def render_strategy(self):
         self.sctrl.DeleteAllItems()
         for k,v in self.s_obj.items():
@@ -920,16 +923,16 @@ class FF(MyFrame):
             self.sctrl.SetItemBackgroundColour(index, wx.Color(229,229,229))
             if v.get('run') == u"True":
                 self.sctrl.CheckItem(index)
-    
+
     def load_market(self):
         self.m_obj = ConfigObj(self.market_ini, encoding='utf-8')
-    
+
     def load_commodity(self):
         self.c_obj = ConfigObj(self.commodity_ini, encoding='utf-8')
-    
+
     def load_strategy(self):
         self.s_obj = ConfigObj(self.strategy_ini, encoding='utf-8')
-    
+
     def loaddata(self):
         self.load_market()
         self.load_commodity()
@@ -939,10 +942,10 @@ class FF(MyFrame):
         if text:
             self.log.AppendText(datetime.datetime.now().strftime("%m-%d %H:%M:%S")+u" "+text+u"\n")
             self.logger.info(text)
-    
+
 if __name__ == '__main__':
     if sys.platform.startswith('win'):
-        multiprocessing.freeze_support() # multiprcessing workaround 
+        multiprocessing.freeze_support() # multiprcessing workaround
 
     app = wx.PySimpleApp(False)
 
@@ -955,15 +958,15 @@ if __name__ == '__main__':
     mylocale.AddCatalogLookupPathPrefix('./locale')
     mylocale.AddCatalog('messages')
     _ = wx.GetTranslation
-    
+
     # override
     import __builtin__
     __builtin__._ = wx.GetTranslation
-    
+
     # override wxobject
     import wxobject
     wxobject._ = wx.GetTranslation
-    
+
     #---------------------------------------------
 
     frm = FF(None)
@@ -972,5 +975,5 @@ if __name__ == '__main__':
     # DEBUG comment out following two line
     import wx.lib.inspection
     wx.lib.inspection.InspectionTool().Show()
-    
+
     app.MainLoop()
