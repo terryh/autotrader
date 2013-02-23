@@ -5,4 +5,4 @@ pandas
 numpy
 chaco
 # for docs
-# cloud_sptheme
+cloud_sptheme
