@@ -864,7 +864,14 @@ class FF(MyFrame):
         # wait for close multiprocessing.Process
         #--------------------------------------------------
         for k in self.quote_process.keys():
-            self.quote_process[k].terminate()
+
+            try:
+                self.quote_process[k].terminate()
+            except WindowsError:
+                # if the quote source server already died
+                # WindowsError: [Error 5]  Access Denied
+                # FIXME
+                pass
 
         for k in self.quote_workers.keys():
             self.quote_workers[k].terminate()
