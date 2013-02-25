@@ -455,9 +455,6 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     if args.commodity and args.config and os.path.isfile(args.config):
-        print args.interval
-        print args.config
-        print args.commodity
         main(args.commodity, args.config, args.interval)
     else:
         print parser.print_help()
