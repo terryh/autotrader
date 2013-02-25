@@ -4,11 +4,13 @@
 
 import os
 import sys
+
+import traceback
 import imp
 import datetime
 import time
 import types
-import getopt
+import argparse
 
 from configobj import ConfigObj
 from collections import defaultdict
@@ -111,7 +113,7 @@ def get_winfunc(libname, funcname, restype=None, argtypes=(), _libcache={}):
     return func
 
 
-DDECALLBACK = WINFUNCTYPE(HDDEDATA, UINT, UINT, HCONV, HSZ, HSZ, HDDEDATA, 
+DDECALLBACK = WINFUNCTYPE(HDDEDATA, UINT, UINT, HCONV, HSZ, HSZ, HDDEDATA,
                           ULONG_PTR, ULONG_PTR)
 
 class DDE(object):
@@ -149,7 +151,7 @@ class DDEClient(object):
 
         self._idInst = DWORD(0)
         self._hConv = HCONV()
-        self.configdict = {} 
+        self.configdict = {}
 
         self._callback = DDECALLBACK(self._callback)
         res = DDE.Initialize(byref(self._idInst), self._callback, 0x00000010, 0)
@@ -252,7 +254,7 @@ def WinMSGLoop():
     while GetMessage(lpmsg, HWND(), 0, 0) > 0:
         #print lpmsg, HWND()
         #print lpmsg, HWND()
-        #print 
+        #print
         TranslateMessage(lpmsg)
         DispatchMessage(lpmsg)
 
@@ -273,7 +275,7 @@ def query(quote_list=[], out=''):
         price         = 0
         volume        = 0
         origin_volume = 0
-        
+
         try:
             fp = file(out)
             content = fp.read()
@@ -284,13 +286,13 @@ def query(quote_list=[], out=''):
             fp.close()
 
         # the out file format is repr in python list [time(),float(price),int(volume)]
-        if fp and content: 
+        if fp and content:
                 content_list = eval(content)
                 try:
-                    origin_volume = content_list[2] 
+                    origin_volume = content_list[2]
                 except:
                     pass
-            
+
         for dd in quote_list:
             quote_time = dd.request(dd.configdict['time'])
             try:
@@ -301,9 +303,9 @@ def query(quote_list=[], out=''):
                 volume = int((dd.request(dd.configdict['volume']))) # volumn integer
             except:
                 volume = 0
-            
+
             if quote_time:
-                
+
                 if quote_time.find(":")>0:
                     # like HH:MM:SS, clean up
                     quote_time = quote_time[quote_time.find(':')-2:quote_time.rfind(':')+3]
@@ -337,7 +339,7 @@ def get_main_dir():
     app_dir = os.path.dirname(os.path.dirname(quote_realpath))
     return app_dir
 
-def main(commodity, config_ini, interval=0.3): 
+def main(commodity, config_ini, interval=0.3):
     #app_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     app_dir = get_main_dir()
     #print app_dir
@@ -368,10 +370,10 @@ def main(commodity, config_ini, interval=0.3):
                     # parent folder data/mcode/ccode
                     quote_dir = os.path.join(app_dir, 'data',  mcode, ccode )
 
-                
+
                 if quote_dir and not os.path.isdir(quote_dir):
                     os.makedirs(quote_dir)
-                   
+
                 output_file =  os.path.join( quote_dir, ccode + ".now")
             # function to catch DDE error
             def gen_ddeclient(s='',t=''):
@@ -382,20 +384,20 @@ def main(commodity, config_ini, interval=0.3):
                     # dde error
                     dc = None
                 return dc
-            
-            
+
+
             # check all needed configure
-            for key, value  in configdict.items(): 
-                # safe check    
+            for key, value  in configdict.items():
+                # safe check
                 for k in request_item + ['server', 'topic']:
                     if k not in value.keys():
                         print "Do not config correctly !"
                         sys.exit()
-            
+
                 # retry time
                 retry_time = time.time() + 10
                 quote_key_id = '%s_%s' % (mcode, ccode)
-                
+
                 quote_config[quote_key_id] = value
                 quote_keyids.append(quote_key_id)
 
@@ -409,15 +411,15 @@ def main(commodity, config_ini, interval=0.3):
                 #DDE_INS.configdict = value
                 #quote_list.append(DDE_INS)
                 #quote_dict[quote_key_id] = DDE_INS
-            
+
             # Main loop
             # FIXME only retry for start up fails, not fail after dde client start
             #if quote_dict:
             try:
                 while True:
-                    query(quote_dict.values(), output_file) 
+                    query(quote_dict.values(), output_file)
                     time.sleep(interval)
-                    
+
                     # retry
                     if len(quote_dict.keys()) != len(quote_keyids) and time.time() > retry_time:
                         # some dde started failed
@@ -429,27 +431,34 @@ def main(commodity, config_ini, interval=0.3):
                                 if dde_instance:
                                     dde_instance.configdict = quote_config[keyid]
                                     quote_dict[quote_key_id] = dde_instance
+            except:
+                print traceback.format_exc()
             finally:
                 print 'Execute Finally'
                 for dde_to_kill in quote_dict.values():
                     dde_to_kill.__del__()
 
+
 if __name__ == '__main__':
-    # wrapper it to command line tool
-    opts, args = getopt.getopt(sys.argv[1:], "i:", ["commodity=", "config=" ] )
-    interval = 0.3
-    commodity = ''
-    config = ''
-    for o, v in opts:
-        if o in ("-i"):
-            interval = float(v)
-        elif o in ("--commodity"):
-            commodity = v
-        elif o in ("--config"):
-            config = v
-    
-    if os.path.isfile(config) and commodity:
-        main(commodity, config, interval)
+
+    # command line tool wrapper
+    parser = argparse.ArgumentParser("""
+    run windows DDE client to send requst to query DDE infomation.
+    """)
+
+    parser.add_argument('-i','--interval', type=float, default=0.3,
+                        help="The interval in second to check and request DDE topic. (default is 0.3 second )")
+
+    parser.add_argument('-com','--commodity', help="The unique commodity name code.")
+    parser.add_argument('-c','--config', help="The path to commodity configure file.")
+
+    args = parser.parse_args()
+
+    if args.commodity and args.config and os.path.isfile(args.config):
+        print args.interval
+        print args.config
+        print args.commodity
+        main(args.commodity, args.config, args.interval)
     else:
-        print __doc__
-    
+        print parser.print_help()
+
