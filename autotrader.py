@@ -13,6 +13,7 @@ import logging
 import re
 import datetime
 import subprocess
+import shlex
 import multiprocessing
 import multiprocessing.forking
 
@@ -123,16 +124,14 @@ def start_quote_workers(market_ini, commodity_ini, ccode ):
 
 ################################################################################
 # start subprocess.Popen outside wxApp main loop
-def sub_quote_process(quote_exe, commodity='',commodity_ini=''):
-    final_command = "%s --config=%s --commodity=%s" % (quote_exe, commodity_ini, commodity)
+def sub_quote_process(final_command):
     #print final_command
-    p = subprocess.Popen( final_command.split())
+    p = subprocess.Popen( shlex.split(final_command))
     return p
 
-def sub_quote_writer(market_ini, commodity_ini, ccode ):
-    final_command = "%s --mini=%s --cini=%s --commodity=%s" % ( QUOTE_WRITER_EXE, market_ini, commodity_ini, ccode)
+def sub_quote_writer(final_command):
     #print final_command
-    p = subprocess.Popen( final_command.split())
+    p = subprocess.Popen( shlex.split(final_command))
     return p
 ################################################################################
 
@@ -820,10 +819,7 @@ class FF(MyFrame):
                         quote_module = __import__("quote.%s" % source , fromlist=[source])
                         quote_exe = source + ".exe"
 
-                        self.loginfo(str(quote_module))
-                        self.loginfo(quote_exe)
-                        self.loginfo(ccode )
-                        self.loginfo(self.commodity_ini)
+                        #self.loginfo(ccode )
 
                         #--------------------------------------------------
                         #  start_quote_process and start_quote_workers
@@ -834,11 +830,17 @@ class FF(MyFrame):
                         #--------------------------------------------------
 
                         #--------------------------------------------------
-                        #  sub_quote_process and sub_quote_workers
-                        t = sub_quote_process( quote_exe, ccode, self.commodity_ini )
+                        #  sub_quote_process and sub_quote_workers, add quote
+                        #  for file path in case path have space
+                        final_command = '%s --config "%s" --commodity %s' % (quote_exe, self.commodity_ini, ccode)
+                        self.loginfo(final_command)
+                        #t = sub_quote_process( quote_exe, ccode, self.commodity_ini )
+                        t = sub_quote_process(final_command)
                         self.quote_process[key] = t
 
-                        w = sub_quote_writer(self.market_ini, self.commodity_ini, ccode)
+                        final_command = '%s --mini="%s" --cini="%s" --commodity=%s' % ( QUOTE_WRITER_EXE, self.market_ini, self.commodity_ini, ccode)
+                        self.loginfo(final_command)
+                        w = sub_quote_writer(final_command)
                         self.quote_workers[key] = w
                         #--------------------------------------------------
 
@@ -874,7 +876,13 @@ class FF(MyFrame):
                 pass
 
         for k in self.quote_workers.keys():
-            self.quote_workers[k].terminate()
+            try:
+                self.quote_workers[k].terminate()
+            except WindowsError:
+                # if the quote source server already died
+                # WindowsError: [Error 5]  Access Denied
+                # FIXME
+                pass
 
         #isalive = 1
         #while isalive:
