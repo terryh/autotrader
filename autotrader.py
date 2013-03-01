@@ -838,7 +838,7 @@ class FF(MyFrame):
                         t = sub_quote_process(final_command)
                         self.quote_process[key] = t
 
-                        final_command = '%s --mini="%s" --cini="%s" --commodity=%s' % ( QUOTE_WRITER_EXE, self.market_ini, self.commodity_ini, ccode)
+                        final_command = '%s --mini "%s" --cini "%s" --commodity %s' % ( QUOTE_WRITER_EXE, self.market_ini, self.commodity_ini, ccode)
                         self.loginfo(final_command)
                         w = sub_quote_writer(final_command)
                         self.quote_workers[key] = w
