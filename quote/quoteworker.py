@@ -5,6 +5,7 @@ import datetime
 import time
 import sys
 import os
+import argparse
 import getopt
 import types
 import re
@@ -14,7 +15,7 @@ import multiprocessing
 import multiprocessing.forking
 
 # third party module
-import pytz 
+import pytz
 from configobj import ConfigObj
 
 def main_is_frozen():
@@ -51,7 +52,7 @@ def get_now(timezone=''):
     return now
 
 def get_tz_hhmm(hour, minute,timezone=''):
-    
+
     if timezone:
         # timezone
         tz = pytz.timezone(timezone)
@@ -90,7 +91,7 @@ class Process(multiprocessing.Process):
 
 
 def quote_update(source_file=""):
-    """We have file quote support only, source_file format , python  list string [datetime.time,price,volume] 
+    """We have file quote support only, source_file format , python  list string [datetime.time,price,volume]
        [HH:MM:SS,price,totalvolume]
     """
     q_l = []
@@ -105,9 +106,9 @@ def quote_update(source_file=""):
 class QuoteWriter(object):
     """To update the quote data from quote source file"""
     #def __init__(self, **kwargs):
-    def __init__(self, market_ini, commodity_ini, commodity, interval=0.3, app_dir= ''): 
+    def __init__(self, market_ini, commodity_ini, commodity, interval=0.3, app_dir= ''):
         #multiprocessing.Process.__init__(self)
-        
+
         # Done in def main
         if not app_dir:
             #app_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -116,11 +117,11 @@ class QuoteWriter(object):
         self.quote_type = {}    # a dict for quote config
         self.mtimezone = ''     # time zone info
         self.mclear = ''        # market clear time
-        self.s1_start = ''      # session 1 start time 
+        self.s1_start = ''      # session 1 start time
         self.s1_end = ''        # session 1 end time
-        self.s2_start = ''      # session 2 start time 
+        self.s2_start = ''      # session 2 start time
         self.s2_end = ''        # session 2 end time
-        self.status = 0         # o stop, 1 running 
+        self.status = 0         # o stop, 1 running
         self.interval = interval
         self.output_file = ''
         self.quote_dir = ''
@@ -128,14 +129,14 @@ class QuoteWriter(object):
         self.time_tickets = []
         self.time_tickets_length = 0
         self.ticket_index = 0
-        self.quote_data = []    # quote_data [[datatime, open, high, low, close, volume]...] 
+        self.quote_data = []    # quote_data [[datatime, open, high, low, close, volume]...]
         self.quote_current = [] # quote_current store min1 current value [datatime, open, high, low, close, volume].
-        self.quote_source_file = '' # we hard code in quote interface always call `commodity`.now 
+        self.quote_source_file = '' # we hard code in quote interface always call `commodity`.now
         self.quote_file = {}    # historty quote csv file open with append store file handler
         self.quote_file_current = {}    # for quote current value open with overwrite store file name not file handler
         self.tz = ''            # timezone obj
         self.base_duration = 60 # seconds
-        
+
         if market_ini and commodity_ini:
             mobj = ConfigObj(market_ini, encoding='utf-8')
             cobj = ConfigObj(commodity_ini, encoding='utf-8')
@@ -146,16 +147,16 @@ class QuoteWriter(object):
                 self.quote_dir = os.path.join(cobj[commodity].get('cdir'), 'data',  mcode, ccode )
             else:
                 self.quote_dir = os.path.join(app_dir, 'data',  mcode, ccode )
-            
+
             self.data_dir = os.path.join(app_dir, 'data', mcode, ccode )
 
             if self.quote_dir and not os.path.isdir(self.quote_dir):
                     os.makedirs(self.quote_dir)
             if self.data_dir and not os.path.isdir(self.data_dir):
                     os.makedirs(self.data_dir)
-           
-            print self.quote_dir             
-            print self.data_dir             
+
+            print self.quote_dir
+            print self.data_dir
 
             #self.output_file = get_ohlc_file( ccode , self.quote_dir)
             self.quote_source_file = os.path.join( self.quote_dir, ccode + ".now")
@@ -175,23 +176,23 @@ class QuoteWriter(object):
                     if k == u'day1':
                         minute = 60*24
                         self.quote_type[k] = 60*24
-            
+
             # we base on 1 minute
             if 'min1' not in self.quote_type:
-                self.quote_type['min1'] = 1 
-                    
+                self.quote_type['min1'] = 1
+
             self.mtimezone = mobj[mcode]['mtimezone']
-            
+
             if self.mtimezone: # timezone
                 tz = pytz.timezone(self.mtimezone)
                 self.tz = tz
-            
+
             self.mclear = mobj[mcode]['mclear']
             self.s1_start = mobj[mcode]['s1_start']
             self.s1_end = mobj[mcode]['s1_end']
             self.s2_start = mobj[mcode]['s2_start']
             self.s2_end = mobj[mcode]['s2_end']
-        
+
         #self.start()
 
     def cook_time_slice(self, session_start, session_end):
@@ -201,8 +202,8 @@ class QuoteWriter(object):
         result = []
         s_hour, s_minute = map(int, session_start.split(':')[:2])
         e_hour, e_minute = map(int, session_end.split(':')[:2])
-        
-        # TODO clean up 
+
+        # TODO clean up
         if self.tz:
             # timezone
             #start_datetime = datetime.datetime.now(tzinfo=self.tz).replace(second=0, microsecond=0)
@@ -229,28 +230,28 @@ class QuoteWriter(object):
                 end_datetime = start_datetime
 
             end_datetime.replace(hour=e_hour, minute=e_minute)
-        
+
         dt = start_datetime
         delta = datetime.timedelta(seconds= self.base_duration )
- 
+
         while dt < end_datetime:
             dt += delta
             result.append(dt)
         if result:
             return result
-    
+
     def find_ticket(self):
         """find the right index for current ticket
         """
-        now = get_now(self.mtimezone) 
+        now = get_now(self.mtimezone)
         i = 0
         market_open = 0
         delta = datetime.timedelta(seconds=self.base_duration) # one minute time frame
-        # load history from min1 quote file data  
+        # load history from min1 quote file data
         min1_fn = self.quote_file['min1']
         print min1_fn
         self.quote_data = csvtolist(min1_fn)
-        
+
         #if now < self.time_tickets[0]-delta:
         #    return i, market_open
         print self.time_tickets[0]
@@ -265,7 +266,7 @@ class QuoteWriter(object):
         self.ticket_index = i
 
     def quote(self):
-        """We have file quote support only, source_file format , python  list string [datetime.time,price,volume] 
+        """We have file quote support only, source_file format , python  list string [datetime.time,price,volume]
            [HH:MM:SS,price,totalvolume]
         """
         q_l = []
@@ -281,7 +282,7 @@ class QuoteWriter(object):
         """
         if not self.quote_type:
             raise Exception('You need at least one quote_type')
-       
+
         # session 1
         #print 'Session', self.s1_start, self.s1_end, self.s2_start, self.s2_end
         if self.s1_start != u"00:00" and self.s1_end: # simple empty check
@@ -293,7 +294,7 @@ class QuoteWriter(object):
             tickets = self.cook_time_slice(self.s2_start, self.s2_end)
             if tickets:
                 self.time_tickets += tickets
-        
+
         # open quote csv file and store quote_file_current list
         for k,v in self.quote_type.items():
             self.quote_file[k] = os.path.join(self.data_dir, k + '.csv')
@@ -309,7 +310,7 @@ class QuoteWriter(object):
                 # time to write this bar
                 # quote_data [[datatime, open, high, low, close, volume]...]
                 process_ticket = zip(*self.quote_data[-v:])
-                # process_ticket 
+                # process_ticket
                 ticket_end = process_ticket[0][-1]
                 dt = ticket_end.strftime("%Y/%m/%d,%H:%M")
                 OO = process_ticket[1][0]
@@ -322,7 +323,7 @@ class QuoteWriter(object):
                 fp = open(self.quote_file[k], 'a') # append history file
                 fp.write(line)
                 fp.close()
-    
+
     def write_current(self):
         print "write current..."
         for k,v in self.quote_type.items():
@@ -337,9 +338,9 @@ class QuoteWriter(object):
                 # just use the last time_tickets
                 dt = self.time_tickets[-1]
                 last_ticket = True
-                
+
             OO, HH, LL, CC, VV = self.quote_current[1:] # skip current ticket time
-            
+
             if k == 'min1':
                 # min1 base data
                 if VV:
@@ -349,7 +350,7 @@ class QuoteWriter(object):
                     fp = open(self.quote_file_current[k], 'w')
                     fp.write(line)
                     fp.close()
-            else: 
+            else:
                 # longer than 1 minute
                 # quote_data [[datatime, open, high, low, close, volume]...]
                 # self.ticket_index 0 1 2 3 4 5 6 ....
@@ -357,7 +358,7 @@ class QuoteWriter(object):
 
                 remainder = (self.ticket_index+1) % v   # ticket_index 0..10...  (ticket_index + 1) % v ==0 on close bar minute
                 print "remainer ", k,v ,remainder
-            
+
                 if remainder == 0:
                     # closing time frame for this bar
                     process_data = self.quote_data[-(v-1):]
@@ -369,18 +370,18 @@ class QuoteWriter(object):
                     else:
                         process_data = []
                     process_data.append(self.quote_current)
-                    
+
                     if not last_ticket:
                         ticket_end = self.time_tickets[self.ticket_index]
                         seconds_delta = self.base_duration * (v-remainder)
                         ticket_end_current = ticket_end + datetime.timedelta(seconds=seconds_delta)
                         dt = ticket_end_current.strftime("%Y/%m/%d,%H:%M")
-                
+
                     #dt = ticket_end_current.strftime("%Y/%m/%d,%H:%M")
-                
+
                 # TODO write correct dt
                 process_ticket = zip(*process_data)
-                # process_ticket 
+                # process_ticket
                 OO = process_ticket[1][0]
                 HH = max(process_ticket[2])
                 LL = min(process_ticket[3])
@@ -396,38 +397,38 @@ class QuoteWriter(object):
         """
         run this quote writer, to keep update quote files
         """
-        # FIXME, use mmap to look up source file, time zone support 
-        self.status = 1 
+        # FIXME, use mmap to look up source file, time zone support
+        self.status = 1
         self.pre_run()
         self.find_ticket()
         print "QT PRE",self.time_tickets[0]
         qt_pre = self.time_tickets[0] - datetime.timedelta(days=1) # previous quotetime set an older default value
-        
+
         ticket_index_pre = 0 # previous ticket index
         close_pre = 0 # previous close price
         volume_pre = 0 # previous bar total volume
 
         # in case our time is slow that market, plus 5 seconds
         safe_seconds = datetime.timedelta(seconds=5)
-        lastticket_end =  self.time_tickets[-1]+ safe_seconds       
+        lastticket_end =  self.time_tickets[-1]+ safe_seconds
         print 'RUN' , self.status
         import pprint
         # init quote None value before market start
         OO = None
-        HH = None 
+        HH = None
         LL = None
-        CC = None 
+        CC = None
         VV = None
         print pprint.pprint(self.time_tickets[0])
         print pprint.pprint(self.time_tickets[-1])
         print self.ticket_index
         print lastticket_end
         while self.status:
-                now = get_now(self.mtimezone) 
+                now = get_now(self.mtimezone)
             #try:
                 #print  self.ticket_index < len(self.time_tickets) and now < lastticket_end
                 if self.ticket_index < len(self.time_tickets) and now < lastticket_end:
-                    # start ticket 
+                    # start ticket
                     ticket_end = self.time_tickets[self.ticket_index]
                     ticket_start = ticket_end - datetime.timedelta(seconds=self.base_duration)
                     # if our time is slow or fast for few seconds, let's say 5 seonds
@@ -473,46 +474,46 @@ class QuoteWriter(object):
                         dt = ticket_end.strftime("%Y/%m/%d,%H:%M")
                         val = "%s,%s,%s,%s,%s" % (str(OO),str(HH),str(LL),str(CC),str(VV))
                         line = "%s,%s" % (dt, val)
-                        
+
                         if now >= ticket_end:
                             # close a ticket
                             print line
-                            
-                            self.quote_data.append([ticket_end,OO, HH, LL, CC, VV])     # push values to quote_data 
+
+                            self.quote_data.append([ticket_end,OO, HH, LL, CC, VV])     # push values to quote_data
                             self.ticket_index += 1                                      # increse ti ticket index start from 0
                             volume_pre = ql[2]                                          # reset volume counter
 
                             # start write other quote_type, self.ticket_index start from , the min1 csv had wrote
                             # and ticket_index update to next example 0, 1, 2, 3, 4 ticket_index plus 1 = 5
-                            print 'Write Quote----------' 
+                            print 'Write Quote----------'
                             self.write_quote()
-                        
-                        qt_pre = qt #remember as previous ticket time 
-                        
+
+                        qt_pre = qt #remember as previous ticket time
+
                         # FIXME change to write every quote_file_current
                         self.quote_current = [ qt, OO, HH, LL, CC, VV ]
                         #print "write current"
                         self.write_current()
-            
+
             #except:
             #    pass
                 time.sleep(self.interval)
-    
+
     def stop(self):
         """
         stop this quote writer
         """
-        self.status = 0 
+        self.status = 0
 
 def main(market_ini, commodity_ini, commodity, interval=0.3):
-    
+
     app_dir = get_main_dir()
-    
+
     try:
         w = QuoteWriter(market_ini, commodity_ini, commodity, interval, app_dir)
         w.start()
     finally:
-        w.stop() 
+        w.stop()
         w.terminate()
         # wait for close process
         isalive = 1
@@ -520,28 +521,56 @@ def main(market_ini, commodity_ini, commodity, interval=0.3):
             isalive = 0
             isalive = w.is_alive()
 
+
 if __name__ == '__main__':
     # command line tool wrapper
-    opts, args = getopt.getopt(sys.argv[1:], "i:", ["cini=", "mini=","commodity=" ] )
-    app_dir = get_main_dir() 
-    if len(opts) > 0:
-        interval      = 1
-        commodity_ini = ''
-        market_ini    = ''
-        commodity     = ''
-        for o, v in opts:
-            if o in ("-i"):
-                interval = float(v)
-            elif o in ("--commodity"):
-                commodity = v
-            elif o in ("--cini"):
-                commodity_ini = v
-            elif o in ("--mini"):
-                market_ini = v
-    if os.path.isfile(commodity_ini) and os.path.isfile(market_ini) and commodity:
-        p = QuoteWriter(market_ini, commodity_ini, commodity, interval, app_dir)
+    app_dir = get_main_dir()
+    parser = argparse.ArgumentParser("""
+    A worker process to collect price merge to history file.
+    """)
+
+    parser.add_argument('-i','--interval', type=float, default=0.3,
+                        help="The interval in second to check current quote. (default is 0.3 second )")
+
+    parser.add_argument('-c','--cini', help="The path to commodity configure file.")
+
+    parser.add_argument('-m','--mini', help="The path to market configure file.")
+
+    parser.add_argument('-com','--commodity', help="The unique commodity name code.")
+
+    args = parser.parse_args()
+
+
+    if ( args.cini and args.mini and args.commodity and
+        os.path.isfile(args.cini) and os.path.isfile(args.mini) ):
+        p = QuoteWriter(args.mini, args.cini, args.commodity, args.interval, app_dir)
         #p.start()
         p.run()
     else:
-        print __doc__
-    
+        print parser.print_help()
+
+#if __name__ == '__main__':
+    ## command line tool wrapper
+    #opts, args = getopt.getopt(sys.argv[1:], "i:", ["cini=", "mini=","commodity=" ] )
+    #app_dir = get_main_dir()
+    #if len(opts) > 0:
+        #interval      = 1
+        #commodity_ini = ''
+        #market_ini    = ''
+        #commodity     = ''
+        #for o, v in opts:
+            #if o in ("-i"):
+                #interval = float(v)
+            #elif o in ("--commodity"):
+                #commodity = v
+            #elif o in ("--cini"):
+                #commodity_ini = v
+            #elif o in ("--mini"):
+                #market_ini = v
+    #if os.path.isfile(commodity_ini) and os.path.isfile(market_ini) and commodity:
+        #p = QuoteWriter(market_ini, commodity_ini, commodity, interval, app_dir)
+        ##p.start()
+        #p.run()
+    #else:
+        #print __doc__
+
