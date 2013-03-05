@@ -766,6 +766,15 @@ class S ( wx.Dialog ):
 		self.end = wx.DatePickerCtrl( self, wx.ID_ANY, wx.DefaultDateTime, wx.DefaultPosition, wx.DefaultSize, wx.DP_DEFAULT )
 		bSizer101.Add( self.end, 0, wx.ALL, 5 )
 		
+		self.m_staticText17111 = wx.StaticText( self, wx.ID_ANY, _(u"History Quote File"), wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText17111.Wrap( -1 )
+		self.m_staticText17111.SetToolTipString( _(u"You sould pick a longer history file for backtest.") )
+		
+		bSizer101.Add( self.m_staticText17111, 0, wx.ALL, 5 )
+		
+		self.historyfile = wx.FilePickerCtrl( self, wx.ID_ANY, wx.EmptyString, _(u"Select a file"), u"*.*", wx.DefaultPosition, wx.DefaultSize, wx.FLP_DEFAULT_STYLE )
+		bSizer101.Add( self.historyfile, 0, wx.ALL, 5 )
+		
 		self.backtest = wx.Button( self, wx.ID_ANY, _(u"Back test"), wx.DefaultPosition, wx.DefaultSize, 0 )
 		bSizer101.Add( self.backtest, 0, wx.ALL, 5 )
 		
