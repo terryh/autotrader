@@ -217,11 +217,15 @@ class Trader(threading.Thread):
     def normalize_date(self):
 
         if self.date_spliter  == '-':
-            self.start_date = self.start_date.replace('/','-')
-            self.end_date = self.end_date.replace('/','-')
+            if self.start_date:
+                self.start_date = self.start_date.replace('/','-')
+            if self.end_date:
+                self.end_date = self.end_date.replace('/','-')
         elif self.date_spliter  == '/':
-            self.start_date = self.start_date.replace('-','/')
-            self.end_date = self.end_date.replace('-','/')
+            if self.start_date:
+                self.start_date = self.start_date.replace('-','/')
+            if self.end_date:
+                self.end_date = self.end_date.replace('-','/')
 
     def clean_date_with_zero(self, date_string):
         return self.date_spliter.join(map( lambda x: "%02d" % int(x), date_string.split(self.date_spliter)))
