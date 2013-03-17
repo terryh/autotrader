@@ -11,6 +11,10 @@
 現在的版本已經可以運作了，目前，回測的功能很簡陋，目前不支援 tick 的模式，只有時間的方式，
 也沒有最佳化的功能，整個設計的邏輯，就是KISS的原則(Keep It Simple & Stupid)，盡可能的簡單化。
 
+更詳細說明，請參考 https://autotrader.readthedocs.org/en/latest/
+
+Windows (32位元) 安裝包 http://dl.dropbox.com/u/14137697/autotrader/20130317/setup.exe
+
 為什麼要用?
 =============
 
