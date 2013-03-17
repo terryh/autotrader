@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-03-05 10:11+0800\n"
+"POT-Creation-Date: 2013-03-17 14:21+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -41,47 +41,54 @@ msgstr "收"
 msgid "volumn"
 msgstr "量"
 
-#: autotrader.py:218 autotrader.py:223
+#: autotrader.py:218 autotrader.py:223 autotrader.py:219
 msgid ""
 "You must at least have strategy file, commodity code, trading time period "
 "and max number of bars will use in strategy."
 msgstr "您必須至少有策略檔案，商品代碼，交易周期，及策略使用需要的最大資料筆數"
 
 #: autotrader.py:219 autotrader.py:227 wxobject.py:107 wxobject.py:699
-#: autotrader.py:224 autotrader.py:232
+#: autotrader.py:224 autotrader.py:232 autotrader.py:220 autotrader.py:228
 msgid "Strategy"
 msgstr "策略"
 
 #: autotrader.py:226 autotrader.py:326 autotrader.py:395 autotrader.py:564
 #: autotrader.py:231 autotrader.py:331 autotrader.py:400 autotrader.py:569
+#: autotrader.py:227 autotrader.py:361 autotrader.py:430 autotrader.py:599
+#: autotrader.py:387 autotrader.py:456 autotrader.py:625
 msgid "Are you sure want to update?"
 msgstr "您確定要更新嗎?"
 
 #: autotrader.py:263 autotrader.py:343 autotrader.py:482 autotrader.py:587
 #: autotrader.py:755 autotrader.py:268 autotrader.py:348 autotrader.py:487
-#: autotrader.py:592 autotrader.py:760
+#: autotrader.py:592 autotrader.py:760 autotrader.py:274 autotrader.py:378
+#: autotrader.py:517 autotrader.py:622 autotrader.py:790 autotrader.py:273
+#: autotrader.py:404 autotrader.py:543 autotrader.py:648 autotrader.py:816
 msgid "Are you sure?"
 msgstr "請您確認?"
 
 #: autotrader.py:264 autotrader.py:344 autotrader.py:483 autotrader.py:588
 #: autotrader.py:659 wxobject.py:313 wxobject.py:435 wxobject.py:655
 #: wxobject.py:789 autotrader.py:269 autotrader.py:349 autotrader.py:488
-#: autotrader.py:593 wxobject.py:798
+#: autotrader.py:593 wxobject.py:798 autotrader.py:275 autotrader.py:379
+#: autotrader.py:518 autotrader.py:623 autotrader.py:274 autotrader.py:405
+#: autotrader.py:544 autotrader.py:649
 msgid "Delete"
 msgstr "刪除"
 
-#: autotrader.py:318 autotrader.py:323
+#: autotrader.py:318 autotrader.py:323 autotrader.py:353 autotrader.py:379
 msgid ""
 "You must at least input DD1, time, price and volume, can refer from Excel."
 msgstr ""
 "您必須要至少一組 DDE 的設定，有時間，價格，總量，可以由 Excel 表格中參考資料"
 
 #: autotrader.py:319 autotrader.py:327 wxobject.py:486 autotrader.py:324
-#: autotrader.py:332
+#: autotrader.py:332 autotrader.py:354 autotrader.py:362 autotrader.py:380
+#: autotrader.py:388
 msgid "DDE"
 msgstr ""
 
-#: autotrader.py:387 autotrader.py:392
+#: autotrader.py:387 autotrader.py:392 autotrader.py:422 autotrader.py:448
 msgid ""
 "You must at least input Commodity Name, Commodity Code (alphanumeric), and "
 "Quote Folder for real time data processing, better at a ram disk folder."
@@ -91,19 +98,21 @@ msgstr ""
 
 #: autotrader.py:388 autotrader.py:396 autotrader.py:557 autotrader.py:565
 #: wxobject.py:68 wxobject.py:173 autotrader.py:393 autotrader.py:401
-#: autotrader.py:562 autotrader.py:570
+#: autotrader.py:562 autotrader.py:570 autotrader.py:423 autotrader.py:431
+#: autotrader.py:592 autotrader.py:600 autotrader.py:449 autotrader.py:457
+#: autotrader.py:618 autotrader.py:626
 msgid "Market"
 msgstr "市場"
 
-#: autotrader.py:395 autotrader.py:400
+#: autotrader.py:395 autotrader.py:400 autotrader.py:430 autotrader.py:456
 msgid "Remember to restart to ative changes."
 msgstr "要啟用修改設定，請記得重新啟動"
 
-#: autotrader.py:447 autotrader.py:452
+#: autotrader.py:447 autotrader.py:452 autotrader.py:482 autotrader.py:508
 msgid "No support quote module found."
 msgstr "沒有找到支援的報價模組"
 
-#: autotrader.py:556 autotrader.py:561
+#: autotrader.py:556 autotrader.py:561 autotrader.py:591 autotrader.py:617
 msgid ""
 "You must at least input Market Name, Market Code (alphanumeric), Session "
 "Clear Time and Session 1 Time"
@@ -111,45 +120,51 @@ msgstr ""
 "您必須至少輸入市場名稱，市場代碼(只能是數字及英文)，清盤時間，及第1盤的交易時"
 "間"
 
-#: autotrader.py:642 wxobject.py:181 autotrader.py:648
+#: autotrader.py:642 wxobject.py:181 autotrader.py:648 autotrader.py:678
+#: autotrader.py:704
 msgid "Market Name"
 msgstr "市場名稱"
 
 #: autotrader.py:643 autotrader.py:649 wxobject.py:189 wxobject.py:389
-#: wxobject.py:494 autotrader.py:655
+#: wxobject.py:494 autotrader.py:655 autotrader.py:679 autotrader.py:685
+#: autotrader.py:705 autotrader.py:711
 msgid "Market Code"
 msgstr "市場代碼"
 
-#: autotrader.py:644 wxobject.py:197 autotrader.py:650
+#: autotrader.py:644 wxobject.py:197 autotrader.py:650 autotrader.py:680
+#: autotrader.py:706
 msgid "Market Time Zone"
 msgstr "市場時區"
 
-#: autotrader.py:647 wxobject.py:365 autotrader.py:653
+#: autotrader.py:647 wxobject.py:365 autotrader.py:653 autotrader.py:683
+#: autotrader.py:709
 msgid "Commodity Name"
 msgstr "商品名稱"
 
 #: autotrader.py:648 autotrader.py:655 wxobject.py:373 wxobject.py:502
-#: wxobject.py:714 autotrader.py:654 autotrader.py:661
+#: wxobject.py:714 autotrader.py:654 autotrader.py:661 autotrader.py:684
+#: autotrader.py:691 autotrader.py:710 autotrader.py:717
 msgid "Commodity Code"
 msgstr "商品代碼"
 
-#: autotrader.py:650 autotrader.py:656
+#: autotrader.py:650 autotrader.py:656 autotrader.py:686 autotrader.py:712
 msgid "Quote Source"
 msgstr "報價源"
 
-#: autotrader.py:651 wxobject.py:407 autotrader.py:657
+#: autotrader.py:651 wxobject.py:407 autotrader.py:657 autotrader.py:687
+#: autotrader.py:713
 msgid "Quote Folder"
 msgstr "報價寫入資料夾"
 
-#: autotrader.py:654 autotrader.py:660
+#: autotrader.py:654 autotrader.py:660 autotrader.py:690 autotrader.py:716
 msgid "Id"
 msgstr ""
 
-#: autotrader.py:656 autotrader.py:662
+#: autotrader.py:656 autotrader.py:662 autotrader.py:692 autotrader.py:718
 msgid "Program File"
 msgstr "程式檔案"
 
-#: autotrader.py:657 autotrader.py:663
+#: autotrader.py:657 autotrader.py:663 autotrader.py:693 autotrader.py:719
 msgid "Time Period"
 msgstr "時間周期"
 
@@ -391,7 +406,7 @@ msgstr "執行"
 msgid "Validate"
 msgstr "驗證"
 
-#: autotrader.py:748 autotrader.py:753
+#: autotrader.py:748 autotrader.py:753 autotrader.py:783 autotrader.py:809
 msgid ""
 "An easy tool for you to trade any commodity you like.\n"
 "License: MIT for individual, GPL for none individual.\n"
@@ -401,7 +416,7 @@ msgstr ""
 "版權: MIT 個人使用發行, GPL 非個人發行.\n"
 " 作者: TerryH"
 
-#: autotrader.py:756 autotrader.py:761
+#: autotrader.py:756 autotrader.py:761 autotrader.py:791 autotrader.py:817
 msgid "Close"
 msgstr "關閉"
 
@@ -418,3 +433,16 @@ msgstr "歷史報價資料"
 #: wxobject.py:771
 msgid "You sould pick a longer history file for backtest."
 msgstr "您應該選擇設定一個有比較長時間的歷史資料檔做回測"
+
+#: autotrader.py:266 autotrader.py:267
+msgid "No error found"
+msgstr "恭喜您，沒有錯誤"
+
+#: autotrader.py:336
+msgid ""
+"You must at least, config start date, end date or both, with history file"
+msgstr "您必須至少有有設定開始日期，或是結束日期，或是兩者都設定，及歷史價格 csv 檔案"
+
+#: autotrader.logr.py:337
+msgid "Back Test"
+msgstr "回測"
