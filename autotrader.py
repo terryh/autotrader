@@ -14,6 +14,7 @@ import re
 import datetime
 import subprocess
 import shlex
+import tempfile
 import multiprocessing
 import multiprocessing.forking
 
@@ -66,6 +67,7 @@ QUOTE_SOURCE = [u"",u'DDE']
 
 # fixed name for quoteworker
 QUOTE_WRITER_EXE = 'quoteworker.exe'
+TRADER_EXE = 'trader.exe'
 
 # support tracking trade time
 SUPPORT_TIME = ['min1', 'min2', 'min3', 'min5', 'min15', 'min30', 'hour1', 'day1']
@@ -124,12 +126,13 @@ def start_quote_workers(market_ini, commodity_ini, ccode ):
 
 ################################################################################
 # start subprocess.Popen outside wxApp main loop
-def sub_quote_process(final_command):
+
+def sub_process_stdout(final_command):
     #print final_command
-    p = subprocess.Popen( shlex.split(final_command))
+    p = subprocess.Popen( shlex.split(final_command), stdout=subprocess.PIPE)
     return p
 
-def sub_quote_writer(final_command):
+def sub_process(final_command):
     #print final_command
     p = subprocess.Popen( shlex.split(final_command))
     return p
@@ -180,7 +183,7 @@ class Strategy(S, Mixin):
         self.inifile = strategy_ini
         self.configobj = {}
         self.c_obj = ConfigObj( commodity_ini, encoding='utf-8')
-        self.field_keys = [ 'strategyfile', 'ccode',
+        self.field_keys = [ 'strategyfile', 'historyfile', 'ccode',
                             'period', 'num', 'cost',
                             'start', 'end', 'sid', 'run'
                             ]
@@ -252,7 +255,16 @@ class Strategy(S, Mixin):
                 self.Destroy()
 
     def onValidate(self,event):
-        self.Close()
+        raw_dict = self.collect_data()
+        if 'strategyfile' in raw_dict:
+            final_command = r'%s --file "%s"' % (TRADER_EXE, raw_dict['strategyfile'])
+            p = sub_process_stdout(final_command)
+            message =  p.stdout.read().strip()
+            if message:
+                print "Go , haha ,cauch U", str(message), len(message), len(message.strip())
+                showMsg(self, message)
+            else:
+                showMsg(self, _("No error found"))
 
     def onDelete(self,event):
         if self.configobj and self.sid.GetValue():
@@ -277,6 +289,57 @@ class Strategy(S, Mixin):
         if keycode == wx.WXK_ESCAPE:
             self.Close()
         event.Skip()
+
+    def onBackTest(self,event):
+        print "BackTest"
+
+        # you must specify the start date, end date or both
+        self.onSubmit(event)
+
+        self.loaddata()
+
+        sid = self.sid.GetValue()
+        raw_dict = self.configobj[sid]
+        # condition to run back test
+        _goBackTest = ( (raw_dict.get('start') or raw_dict.get('end')) and
+                       raw_dict.get('strategyfile') and raw_dict.get('historyfile') )
+        if _goBackTest:
+            # example command
+            #  python trader.py -his FITX.txt --end 2010/10/13 -b 10 -f stest.py
+            command_list = [TRADER_EXE, '--file', r'"%s"' % raw_dict['strategyfile'] ]
+
+            if raw_dict.get('start'):
+                command_list.append("--start")
+                command_list.append(raw_dict['start'])
+
+            if raw_dict.get('end'):
+                command_list.append("--end")
+                command_list.append(raw_dict['end'])
+
+            # must have
+            command_list.append("--history")
+            command_list.append( r'"%s"' % raw_dict['historyfile'])
+
+            final_command = " ".join(command_list)
+            p = sub_process_stdout(final_command)
+            message =  p.stdout.read().strip()
+            #message =  p.stdout.read()
+            if message:
+                # clean windows stdout line break
+                message = message.replace('\r',"")
+                fname = os.path.join(tempfile.gettempdir(),"autotrader.csv")
+                fp = open(fname,"w")
+                fp.write(message)
+                os.startfile(fname)
+        else:
+            dlg = wx.MessageDialog(self,
+                    _("You must at least, config start date, end date or both, with history file"),
+                    _("Back Test"),
+                    wx.OK | wx.ICON_INFORMATION
+                    )
+            dlg.ShowModal()
+            dlg.Destroy()
+
 
     def get_new_id(self):
         start_id = 1
@@ -765,13 +828,7 @@ class FF(MyFrame):
         """
         create process for quote service, strategy  start or stop
         """
-        #if self.test == None:
-            ##self.loginfo('onTimer start TEST')
-            #proc = subprocess.Popen(sys.executable + " pp.py")
-            #self.test = proc
-        #self.loginfo(sys.executable)
 
-        # TODO, clean up
         #self.loginfo('onTimer')
         for k, v in self.c_obj.items():
             if v.get('csource'):
@@ -800,28 +857,30 @@ class FF(MyFrame):
                     session_end = s1_end
 
                 key = "%s_%s" % (mcode, ccode)
-                #self.loginfo(str(self.quote_process))
 
+                # commodity configureobj, get quote dir
+                com_data_dir = os.path.join(app_dir, 'data',  mcode, ccode )
+                if v.get('cdir', False):
+                    com_quote_dir = os.path.join(v.get('cdir'), 'data',  mcode, ccode )
+                else:
+                    # parent folder data/mcode/ccode
+                    com_quote_dir = com_data_dir
+
+                #self.loginfo(str(self.quote_process))
                 if self.should_running(session_start, session_end, mtimezone):
                     # check this quote should running
                     if key not in self.quote_process:
                         # not running quote process
-                        s_hour, s_minute = map(int, session_start.split(':',1))
-                        now = get_now(mtimezone)
-
-                        market_start_time = get_tz_hhmm(s_hour, s_minute, mtimezone)
-                        self.loginfo(mtimezone)
-                        self.loginfo(str(now))
-                        self.loginfo(str(market_start_time))
-                        self.loginfo(str((market_start_time-now).seconds))
+                        #s_hour, s_minute = map(int, session_start.split(':',1))
+                        #now = get_now(mtimezone)
+                        #market_start_time = get_tz_hhmm(s_hour, s_minute, mtimezone)
                         # we must start app 1 minute before market open
                         #if  (market_start_time-now).seconds < 60:
-                        quote_module = __import__("quote.%s" % source , fromlist=[source])
+                        #quote_module = __import__("quote.%s" % source , fromlist=[source])
                         quote_exe = source + ".exe"
 
-                        #self.loginfo(ccode )
-
                         #--------------------------------------------------
+                        # TODO nolonger use, REMOVE
                         #  start_quote_process and start_quote_workers
                         #t = start_quote_process( source, ccode, self.commodity_ini )
                         #self.quote_process[key] = t
@@ -829,20 +888,52 @@ class FF(MyFrame):
                         #self.quote_workers[key] = w
                         #--------------------------------------------------
 
+
                         #--------------------------------------------------
+                        # FIXME, need to uncomment
                         #  sub_quote_process and sub_quote_workers, add quote
                         #  for file path in case path have space
                         final_command = '%s --config "%s" --commodity %s' % (quote_exe, self.commodity_ini, ccode)
                         self.loginfo(final_command)
-                        #t = sub_quote_process( quote_exe, ccode, self.commodity_ini )
-                        t = sub_quote_process(final_command)
+                        t = sub_process(final_command)
                         self.quote_process[key] = t
 
                         final_command = '%s --mini "%s" --cini "%s" --commodity %s' % ( QUOTE_WRITER_EXE, self.market_ini, self.commodity_ini, ccode)
                         self.loginfo(final_command)
-                        w = sub_quote_writer(final_command)
+                        w = sub_process(final_command)
                         self.quote_workers[key] = w
                         #--------------------------------------------------
+
+                    #--------------------------------------------------
+                    # check srategy should running
+                    for sk,sv in self.s_obj.items():
+                        # we store Troe False as string, TODO s_obj not update
+                        # after saved, but should be lock update after running
+                        # trader. ???
+                        if sv['ccode'] == ccode:
+                            if sv['run'] == True:
+                                # prepare command
+                                period_code = SUPPORT_TIME[SUPPORT_TIME_NAME.index(sv['period'])]
+                                hisfile = os.path.join( com_data_dir,"%s.csv" % (period_code))
+                                quotefile = os.path.join( com_quote_dir,"%s.ohlc" % (period_code))
+                                #trader.py -his data\SMX\STW\min5.csv -q R:\TEMP\data\SMX\STW\min5.ohlc -f stest.py -g
+                                final_command = r'%s --history "%s" --quote "%s" --file "%s" -g' % (TRADER_EXE, hisfile, quotefile, sv['strategyfile'])
+
+                                # check exist or dead
+                                if sk not in self.trader:
+                                    self.loginfo(final_command)
+                                    t = sub_process(final_command)
+                                    self.trader[sk] = t
+                                else:
+                                    # have tarder running, let's poll it health
+                                    if self.trader[sk].poll() != None:
+                                        # poll() == None mean running, maybe
+                                        # some thing wrong restart it.
+                                        self.trader.pop(sk)
+                                        self.loginfo(final_command)
+                                        t = sub_process(final_command)
+                                        self.trader[sk] = t
+                    #--------------------------------------------------
 
     def should_running(self, start, end, timezone):
         if (start and end and timezone):
@@ -865,6 +956,14 @@ class FF(MyFrame):
 
         # wait for close multiprocessing.Process
         #--------------------------------------------------
+        for k in self.trader.keys():
+            try:
+                self.trader[k].terminate()
+            except WindowsError:
+                # if the quote source server already died
+                # WindowsError: [Error 5]  Access Denied
+                # FIXME
+                pass
         for k in self.quote_process.keys():
 
             try:
