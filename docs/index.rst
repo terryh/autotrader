@@ -14,14 +14,16 @@ Autotrader 說明文件
 開始畫面
 ---------
     
-    image
+    .. image:: _static/main.png
+        :class: intro
 
     主要畫面，分為四的區塊，左上，目前有設定的交易市場，左下，目前設定的交易商品，
     右上，系統訊息，右下，交易策略設定。
 
 新建市場
 ------------
-    image 
+    .. image:: _static/market.png
+        :class: intro
     
     建立交易市場，名稱，代碼，交易市場的時區，第1盤，第2盤，交易開始時間，及結束時間，例如像是
     像是台灣的期貨市場，只要設定第1 盤即可，開始 08:45，結束 13:45 即可，直接點擊兩下，就可以
@@ -31,12 +33,14 @@ Autotrader 說明文件
 新建商品
 ------------
     
-    image
+    .. image:: _static/commodity.png
+        :class: intro
 
     新增交易商品，商品名稱，代碼，選擇市場，設定每點價值，報價源資料，目前只支援 DDE，即時寫入報價檔
     的資料夾，最好是設定在 ramdisk 上面。
 
-    image
+    .. image:: _static/dde.png
+        :class: intro
 
     DDE 報價源設定，可以設定商品的 DDE 資訊，若是不清楚，可以拖曳報價資訊到到 Excel 表格下取得，
     請記得，在系統執行前，先開啟報價源的系統程式，台灣目前我是用康和的系統
@@ -46,10 +50,19 @@ Autotrader 說明文件
 新建策略
 ------------
 
-    image
+    .. image:: _static/strategy.png
+        :class: intro
 
     新增交易策略，選擇您編寫好的交易策略檔，純 Python 的檔案，您可以用您喜歡的編輯器，直接編輯，
     選擇交易商品的代碼，及使用的時間周期，設定策略使用的最大 K bar 資料比數
+
+策略執行
+---------
+    
+    .. image:: _static/chart.png
+        :class: intro
+
+    交易實際執行的畫面，trader.exe 及每一個程式都是各自獨立，autotrader 只是程序控制的介面
 
 策略撰寫
 ---------
