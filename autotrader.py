@@ -1087,7 +1087,7 @@ if __name__ == '__main__':
     frm.Show()
 
     # DEBUG comment out following two line
-    import wx.lib.inspection
-    wx.lib.inspection.InspectionTool().Show()
+    #import wx.lib.inspection
+    #wx.lib.inspection.InspectionTool().Show()
 
     app.MainLoop()
