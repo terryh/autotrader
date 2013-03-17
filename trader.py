@@ -16,10 +16,7 @@ import random
 #import getopt
 #import multiprocessing
 
-try:
-    from cStringIO import StringIO
-except:
-    from StringIO import StringIO
+from cStringIO import StringIO
 
 #import types
 
@@ -52,6 +49,7 @@ class Trader(threading.Thread):
     _csv_fields = ['date','time', 'open','high','low','close','volumn']
 
     def __init__(self, quote_now_file, quote_history_file, strategy_file,
+                    backtest_history_file="",
                     timezone="",
                     backbars=300,
                     interval=0.3,
@@ -72,8 +70,8 @@ class Trader(threading.Thread):
         self.strategy_source= ""
         self.compiled_code = "" # store compiled code
 
-        self.start_date=""
-        self.end_date=""
+        self.start_date=start_date
+        self.end_date=end_date
 
         self.pov=pov            # Point of value
         self.tax=tax
@@ -88,11 +86,13 @@ class Trader(threading.Thread):
 
         self.tz = ''            # timezone obj
 
+        self.date_spliter = '/' # default date string spliter
+
         self.base_duration = 60 # seconds
 
         self.mapping_fields = [] # for pandas.io.parsers.read_csv
 
-        if timezone: # timezone
+        if timezone: # timezone  FIXME seems don't need
             self.mtimezone  = timezone
             self.tz = pytz.timezone(self.mtimezone)
         #----------------------------------------------------------------------
@@ -117,12 +117,13 @@ class Trader(threading.Thread):
     def check_strategy(self):
         """check strategy_source, try to compile to python byte code
         """
-        # TODO
         source = ""
         message = ""
         code = ""
         if self.strategy_file and os.path.isfile(self.strategy_file):
             source = open(self.strategy_file).read()
+        else:
+            message += "file `%s` not found" % (self.strategy_file)
 
         if source:
             try:
@@ -130,7 +131,8 @@ class Trader(threading.Thread):
             except:
                 # compile error
                 # TODO
-                message = traceback.print_exc()
+                message = traceback.format_exc()
+                message = message.strip()
 
             if message:
                 # TODO echo this and log this
@@ -138,8 +140,8 @@ class Trader(threading.Thread):
             else:
                 self.compiled_code = code
                 self.strategy_source = source
+        return message
 
-    # TODO wrong wrong wrong
     def update_data(self):
         """
         update history file data after run, use during trading
@@ -151,12 +153,9 @@ class Trader(threading.Thread):
             fp = open(self.quote_history_file ,"rb")
 
             content = fp.read()
-            if os.path.isfile(self.quote_now_file):
+            if self.quote_now_file and os.path.isfile(self.quote_now_file):
                 line = open(self.quote_now_file, "rb").read()
                 content += line
-                #print "###################"
-                #print content
-
 
             if self.mapping_fields:
                 backbars_content = content = '\n'.join(content.splitlines()[-self.backbars:]) # alwayse take same line data
@@ -205,9 +204,7 @@ class Trader(threading.Thread):
             content = fp.read()
             if os.path.isfile(self.quote_now_file):
                 line = open(self.quote_now_file, "rb").read()
-                print "###################"
                 content += line
-                print content
 
             if self.mapping_fields:
                 backbars_content = content = '\n'.join(content.splitlines()[-self.backbars:]) # alwayse take same line data
@@ -216,6 +213,21 @@ class Trader(threading.Thread):
             fp.close()
             del(fp)
             del(content)
+
+    def normalize_date(self):
+
+        if self.date_spliter  == '-':
+            self.start_date = self.start_date.replace('/','-')
+            self.end_date = self.end_date.replace('/','-')
+        elif self.date_spliter  == '/':
+            self.start_date = self.start_date.replace('-','/')
+            self.end_date = self.end_date.replace('-','/')
+
+    def clean_date_with_zero(self, date_string):
+        return self.date_spliter.join(map( lambda x: "%02d" % int(x), date_string.split(self.date_spliter)))
+
+    def clean_date_without_zero(self, date_string):
+        return self.date_spliter.join(map( lambda x: "%d" % int(x), date_string.split(self.date_spliter)))
 
     def read_data(self):
         """
@@ -226,12 +238,32 @@ class Trader(threading.Thread):
             content = fp.read()
             si = -1 # start point index
             ei = -1
+
+            # setup date spliter, default is '/'
+            prefix = content[:10]
+            if '-' in prefix:
+                self.date_spliter = '-'
+
+            # get start end date string normalize
+            self.normalize_date()
+
             # check for start or end
             if self.start_date:
-                si = content.find(self.start_date)
+                date_string = self.clean_date_with_zero(self.start_date)
+                si = content.find(date_string)
+                if si < 0:
+                    #not founf, let's try without zero date
+                    date_string = self.clean_date_without_zero(self.start_date)
+                    si = content.find(date_string)
 
             if self.end_date:
-                ei = content.rfind(self.end_date) # look up from end of file
+                date_string = self.clean_date_with_zero(self.end_date)
+                ei = content.rfind(date_string)
+                if ei < 0:
+                    #not founf, let's try without zero date
+                    date_string = self.clean_date_without_zero(self.end_date)
+                    ei = content.rfind(date_string)
+
 
             # prepare the buffer
             if si >0 and ei>0:
@@ -310,7 +342,6 @@ class Trader(threading.Thread):
         #dl,tl,ol,hl,ll,cl,vl = [],[],[],[],[],[],[]
         rows_number = len(self.dataframe)
         backbars = self.backbars # save typing
-
         #t1 = time.time()
         if rows_number > backbars:
             for i in range(backbars, rows_number):
@@ -350,7 +381,8 @@ class Trader(threading.Thread):
 
             #print time.time() - t1
             if self.start_date or self.end_date or not self.quote_now_file:
-                ORDER.REPORT()
+                # reurn string for output
+                return ORDER.REPORT()
 
         ## clear now data
         #self.reload_read_data() # load data
@@ -443,20 +475,31 @@ if __name__ == '__main__':
     """)
     parser.add_argument('-f','--file',
                         help="The strategy file gona to run.")
+
     parser.add_argument('-q','--quote',
                         help="The quote file to get latest price update.")
+
     parser.add_argument('-his','--history',
                         help="The history file to get history OHLC value.")
+
+    parser.add_argument('-test','--backtest',
+                        help="The back test history file.")
+
     parser.add_argument('-s','--start',
                         help="Do back testing from date `start` to last day or `end`")
+
     parser.add_argument('-e','--end',
                         help="Do back testing from first date or `start` to `end`.")
+
     parser.add_argument('-b','--backbars', type=int, default=200,
                         help="How many backbars your strategy need. (  default is 200 )")
+
     parser.add_argument('-pv','--pov', type=float, default=0,
                         help="Point of value.")
+
     parser.add_argument('-tx','--tax', type=float, default=0,
                         help="Tax or comission for each order.")
+
     parser.add_argument('-i','--interval', type=float, default=1,
                         help="The interval in second to check and run this strategy file. (default is 0.3 second )")
 
@@ -474,10 +517,11 @@ if __name__ == '__main__':
                     #tax=0,
                     #app_dir= '../'):
     timezone = ''
-    if args.file and args.history:
+    if args.file:
         t = Trader( args.quote,
                     args.history,
                     args.file,
+                    args.backtest,
                     timezone,
                     args.backbars,
                     args.interval,
@@ -487,23 +531,31 @@ if __name__ == '__main__':
                     args.tax,
                     app_dir)
         #t.run()
-        t.start()
         if args.gui and args.quote:
             # show gui in main process as main loop only having current quote file
-            from pricechart import Trait
             # wait the thread to prepare data
+            t.start()
             while t.status == 0:
                 time.sleep(3)
             #print t.__dict__.keys()
             #print t.dataframe
+            from pricechart import Trait
             gui = Trait(t.dataframe)
             gui.configure_traits()
-            gui.title = u"阿賢"
-        elif args.gui:
-            print "The GUI mode must have current quote file option"
-        else:
+            #gui.title = u"阿賢"
+        elif args.quote:
             # only stay in terminal
+            t.start()
             while t.is_alive():
                 # dummy main loop, take break
                 time.sleep(2)
+        elif args.start or args.end:
+            # back testing
+            results =  t.run()
+            print results
+        elif args.file:
+            # at least have strategy file, let's validate it
+            print t.check_strategy()
+            #print t.strategy_source()
+            #print  ""
 
