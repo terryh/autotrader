@@ -4,7 +4,9 @@ Drawing realtime plot for trading
 """
 
 # Major library imports
-import time, os, sys
+import time
+import os
+import sys
 import wx
 import random
 
@@ -34,21 +36,21 @@ from traits.has_traits import on_trait_change
 from pyface.timer.api import Timer
 
 # Chaco imports
-from chaco.api import ( ArrayPlotData,
-                        ArrayDataSource,
-                        HPlotContainer,
-                        VPlotContainer,
-                        OverlayPlotContainer,
-                        Plot,
-                        PlotAxis,
-                        BarPlot,
-                        FilledLinePlot,
-                        DataRange1D,
-                        LinearMapper,
-                        create_line_plot,
-                        add_default_axes,
-                        add_default_grids
-                        )
+from chaco.api import (ArrayPlotData,
+                       ArrayDataSource,
+                       HPlotContainer,
+                       VPlotContainer,
+                       OverlayPlotContainer,
+                       Plot,
+                       PlotAxis,
+                       BarPlot,
+                       FilledLinePlot,
+                       DataRange1D,
+                       LinearMapper,
+                       create_line_plot,
+                       add_default_axes,
+                       add_default_grids
+                       )
 
 from chaco.tools.api import PanTool, ZoomTool, LineInspector, BroadcasterTool
 from chaco.data_range_2d import DataRange2D
@@ -57,10 +59,11 @@ from chaco.data_range_2d import DataRange2D
 ## Attributes to use for the plot view.
 size = (900, 600)
 title = "Candlestick plot"
-bg_color="lightgray"
-color_green = (139/255.0, 186/255.0, 71/255.0, 1)
-color_red = (255/255.0, 33/255.0, 33/255.0, 1)
+bg_color = "lightgray"
+color_green = (139 / 255.0, 186 / 255.0, 71 / 255.0, 1)
+color_red = (255 / 255.0, 33 / 255.0, 33 / 255.0, 1)
 ################################################################################
+
 
 class XYTool(BaseTool):
     """
@@ -77,6 +80,7 @@ class XYTool(BaseTool):
             return self.callback(self, data)
         return []
 
+
 class AnimationHandler(Handler):
     def init(self, info):
         super(AnimationHandler, self).init(info)
@@ -87,12 +91,13 @@ class AnimationHandler(Handler):
         super(AnimationHandler, self).closed(info, is_ok)
         info.object.timer.Stop()
 
+
 class Trait(HasTraits):
     """
     Main Drawing view for plot
     """
-    container = VPlotContainer(padding = 0, fill_padding = True,
-                        bgcolor = "lightgray", use_backbuffer=True)
+    container = VPlotContainer(padding=0, fill_padding=True,
+                               bgcolor="lightgray", use_backbuffer=True)
 
     #container2 = OverlayPlotContainer(padding = 5, fill_padding = True,
     #                    bgcolor = "lightgray", use_backbuffer=True)
@@ -105,23 +110,24 @@ class Trait(HasTraits):
 
     plot = Instance(Plot)
     # TraitsUI view
-    traits_view = View( Group(
-            VGroup(
+    traits_view = View(Group(
+        VGroup(
             #HGroup(Item("str_time", label="時間"), show_border = True, label = u"詳細資料"),
-            HGroup( Item("str_time", label=_("time")),
-                    Item("float_open", label=_("open")),
-                    Item("float_high", label=_("high")),
-                    Item("float_low", label=_("low")),
-                    Item("float_close", label=_("close")),
-                    Item("float_volumn", label=_("volumn")),
-                    show_border = True, label = u"詳細資料"),
-            VGroup(Item("container", editor = ComponentEditor(), show_label = False))
-            )),
-            resizable = True,
-            width = size[0],
-            height = size[1],
-            handler = AnimationHandler(),
-            title=u"Autotrader")
+            HGroup(Item("str_time", label=_("time")),
+                   Item("float_open", label=_("open")),
+                   Item("float_high", label=_("high")),
+                   Item("float_low", label=_("low")),
+                   Item("float_close", label=_("close")),
+                   Item("float_volumn", label=_("volumn")),
+                   show_border=True, label=u"詳細資料"),
+            VGroup(Item(
+                "container", editor=ComponentEditor(), show_label=False))
+        )),
+        resizable=True,
+        width=size[0],
+        height=size[1],
+        handler=AnimationHandler(),
+        title=u"Autotrader")
             #title=u"Plot 中文")
 
     # Constructor
@@ -136,11 +142,11 @@ class Trait(HasTraits):
     def _compute_range2d(self):
         #if len(self.df)> 100:
         lowy = min(self.df.low[-100:])
-        lowy = lowy *0.998
+        lowy = lowy * 0.998
         lowx = len(self.df) - 100
 
         highy = max(self.df.high[-300:])
-        highy = highy *1.002
+        highy = highy * 1.002
 
         highx = len(self.df)
         range2d = DataRange2D(low=(lowx, lowy),
@@ -163,23 +169,24 @@ class Trait(HasTraits):
 
             ####################################################################
             # create volumn plot
-            vol_plot = BarPlot( index=time_ds , value=vol_ds,
-                            index_mapper = xmapper,
-                            value_mapper = vol_mapper,
-                            line_color = "transparent",
-                            fill_color = "blue",
-                            bar_width = 0.6,
-                            antialias = False,
-                            height = 100,
-                            resizable = "h",
-                            origin = "bottom left",
-                            bgcolor = "white",
-                            border_visible = True
-                            )
+            vol_plot = BarPlot(index=time_ds, value=vol_ds,
+                               index_mapper=xmapper,
+                               value_mapper=vol_mapper,
+                               line_color="transparent",
+                               fill_color="blue",
+                               bar_width=0.6,
+                               antialias=False,
+                               height=100,
+                               resizable="h",
+                               origin="bottom left",
+                               bgcolor="white",
+                               border_visible=True
+                               )
 
             vol_plot.padding = 30
             vol_plot.padding_left = 40
-            vol_plot.tools.append(PanTool(vol_plot, constrain=True, constrain_direction="x"))
+            vol_plot.tools.append(
+                PanTool(vol_plot, constrain=True, constrain_direction="x"))
             add_default_grids(vol_plot)
             add_default_axes(vol_plot)
 
@@ -191,41 +198,45 @@ class Trait(HasTraits):
             ####################################################################
             ## Create price plot
 
-            sorted_vals = np.vstack((self.df.open, self.df.high, self.df.low, self.df.close))
+            sorted_vals = np.vstack(
+                (self.df.open, self.df.high, self.df.low, self.df.close))
             sorted_vals.sort(0)
             __bool = self.df.close.values - self.df.open.values
-            self.up_boolean =  __bool >=0
+            self.up_boolean = __bool >= 0
             self.down_boolean = np.invert(self.up_boolean)
 
             pd = ArrayPlotData(
-                            up_index = self.indexes[self.up_boolean],
-                            up_min = sorted_vals[0][self.up_boolean],
-                            up_bar_min = sorted_vals[1][self.up_boolean],
-                            up_bar_max = sorted_vals[2][self.up_boolean],
-                            up_max = sorted_vals[3][self.up_boolean],
-                            down_index = self.indexes[self.down_boolean],
-                            down_min = sorted_vals[0][self.down_boolean],
-                            down_bar_min = sorted_vals[1][self.down_boolean],
-                            down_bar_max = sorted_vals[2][self.down_boolean],
-                            down_max = sorted_vals[3][self.down_boolean],
-                            volumn = self.df.volumn.values,
-                            index = self.indexes
-                            )
+                up_index=self.indexes[self.up_boolean],
+                up_min=sorted_vals[0][self.up_boolean],
+                up_bar_min=sorted_vals[1][self.up_boolean],
+                up_bar_max=sorted_vals[2][self.up_boolean],
+                up_max=sorted_vals[3][self.up_boolean],
+                down_index=self.indexes[self.down_boolean],
+                down_min=sorted_vals[0][self.down_boolean],
+                down_bar_min=sorted_vals[1][self.down_boolean],
+                down_bar_max=sorted_vals[2][self.down_boolean],
+                down_max=sorted_vals[3][self.down_boolean],
+                volumn=self.df.volumn.values,
+                index=self.indexes
+            )
 
             price_plot = Plot(pd)
 
-            up_plot = price_plot.candle_plot(("up_index", "up_min", "up_bar_min", "up_bar_max", "up_max"),
-                             color = color_red,
-                             bgcolor = "azure",
-                             bar_line_color = "black",
-                             stem_color = "black",
-                             end_cap= False)[0]
+            up_plot = price_plot.candle_plot(
+                ("up_index", "up_min", "up_bar_min", "up_bar_max", "up_max"),
+                color=color_red,
+                bgcolor="azure",
+                bar_line_color="black",
+                stem_color="black",
+                end_cap=False)[0]
 
-            down_plot = price_plot.candle_plot(("down_index", "down_min", "down_bar_min", "down_bar_max", "down_max"),
-                             color = color_green,
-                             bar_line_color = "black",
-                             stem_color = "black",
-                             end_cap= False)[0]
+            down_plot = price_plot.candle_plot(
+                ("down_index", "down_min", "down_bar_min",
+                 "down_bar_max", "down_max"),
+                color=color_green,
+                bar_line_color="black",
+                stem_color="black",
+                end_cap=False)[0]
 
             price_plot.fill_padding = True
             price_plot.padding = 30
@@ -233,22 +244,23 @@ class Trait(HasTraits):
 
             price_plot.tools.append(ZoomTool(component=price_plot, tool_mode="box", zoom_factor=1.2, always_on=False))
             price_plot.tools.append(PanTool(price_plot, drag_button="left"))
-            price_plot.tools.append(XYTool(price_plot, callback=self._update_ohlc)) # get data
+            price_plot.tools.append(
+                XYTool(price_plot, callback=self._update_ohlc))  # get data
             self._add_line_tool(up_plot)
             self._add_line_tool(down_plot)
             price_plot.range2d = self._compute_range2d()
 
-            price_plot.index_mapper = vol_plot.index_mapper # maper vol_plot and price_plot
+            price_plot.index_mapper = vol_plot.index_mapper  # maper vol_plot and price_plot
             self.price_plot = price_plot
 
             self.container.add(price_plot)
 
     def _update_ohlc(self, tool, xyarray):
         """Update Open, High, Low, Close, DateTime, items"""
-        if xyarray.size== 2:
+        if xyarray.size == 2:
             # [x,y] ndarray
             xindex = int(round(xyarray[0]))
-            if xindex >=0 and xindex <= self.df.last_valid_index():
+            if xindex >= 0 and xindex <= self.df.last_valid_index():
                 self.str_time = self.df.date_time[xindex].strftime("%H:%M")
                 self.float_open = self.df.open[xindex]
                 self.float_high = self.df.high[xindex]
@@ -259,10 +271,10 @@ class Trait(HasTraits):
 
     def _add_line_tool(self, input_plot):
             input_plot.overlays.append(LineInspector(input_plot, axis='index',
-                                            #inspect_mode="indexed", # will show two line
-                                            color="gray",
-                                            write_metadata=True,
-                                            is_listener=True))
+                                                     #inspect_mode="indexed", # will show two line
+                                                     color="gray",
+                                                     write_metadata=True,
+                                                     is_listener=True))
 
     ############################################################################
     ###  check plot data
@@ -272,22 +284,33 @@ class Trait(HasTraits):
         # vol_plot value update
         self.vol_plot.value.set_data(self.df.volumn.values)
         # price_plot value update
-        sorted_vals = np.vstack((self.df.open, self.df.high, self.df.low, self.df.close))
+        sorted_vals = np.vstack(
+            (self.df.open, self.df.high, self.df.low, self.df.close))
         sorted_vals.sort(0)
         __bool = self.df.close.values - self.df.open.values
-        self.up_boolean =  __bool >=0
+        self.up_boolean = __bool >= 0
         self.down_boolean = np.invert(self.up_boolean)
 
-        self.price_plot.data.set_data('up_index', self.indexes[self.up_boolean])
-        self.price_plot.data.set_data('up_min', sorted_vals[0][self.up_boolean])
-        self.price_plot.data.set_data('up_bar_min', sorted_vals[1][self.up_boolean])
-        self.price_plot.data.set_data('up_bar_max', sorted_vals[2][self.up_boolean])
-        self.price_plot.data.set_data('up_max', sorted_vals[3][self.up_boolean])
-        self.price_plot.data.set_data('down_index', self.indexes[self.down_boolean])
-        self.price_plot.data.set_data('down_min', sorted_vals[0][self.down_boolean])
-        self.price_plot.data.set_data('down_bar_min', sorted_vals[1][self.down_boolean])
-        self.price_plot.data.set_data('down_bar_max', sorted_vals[2][self.down_boolean])
-        self.price_plot.data.set_data('down_max', sorted_vals[3][self.down_boolean])
+        self.price_plot.data.set_data(
+            'up_index', self.indexes[self.up_boolean])
+        self.price_plot.data.set_data(
+            'up_min', sorted_vals[0][self.up_boolean])
+        self.price_plot.data.set_data(
+            'up_bar_min', sorted_vals[1][self.up_boolean])
+        self.price_plot.data.set_data(
+            'up_bar_max', sorted_vals[2][self.up_boolean])
+        self.price_plot.data.set_data(
+            'up_max', sorted_vals[3][self.up_boolean])
+        self.price_plot.data.set_data(
+            'down_index', self.indexes[self.down_boolean])
+        self.price_plot.data.set_data(
+            'down_min', sorted_vals[0][self.down_boolean])
+        self.price_plot.data.set_data(
+            'down_bar_min', sorted_vals[1][self.down_boolean])
+        self.price_plot.data.set_data(
+            'down_bar_max', sorted_vals[2][self.down_boolean])
+        self.price_plot.data.set_data(
+            'down_max', sorted_vals[3][self.down_boolean])
         #print "T1", time.time() - t1
 
     def on_timer(self):
@@ -303,7 +326,7 @@ if __name__ == "__main__":
     # TODO test
     import pandas
 
-    res = pandas.read_csv('T.CSV',names=['date','time', 'open','high','low','close','volumn','nan'],parse_dates=[[0,1]])
+    res = pandas.read_csv('T.CSV', names=['date', 'time', 'open', 'high', 'low', 'close', 'volumn', 'nan'], parse_dates=[[0, 1]])
 
     gui = Trait(res)
     gui.configure_traits()
@@ -316,4 +339,3 @@ if __name__ == "__main__":
     #app.SetTopWindow(frame)
     #app.MainLoop()
     #demo_main(PlotFrame, size=(600,500), title="plot")
-
